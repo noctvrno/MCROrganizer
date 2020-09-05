@@ -1,0 +1,17 @@
+﻿<UserControl x:Class="MCROrganizer.Core.View.MainControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MCROrganizer.Core.View"
+             xmlns:viewModel ="clr-namespace:MCROrganizer.Core.ViewModel"
+             mc:Ignorable="d" 
+             Width="400"
+             Height="Auto"
+             Background="Gray">
+    <!-- Bind the control's DataContext to the class that will govern all the logic. -->
+    <UserControl.DataContext>
+        <viewModel:ControlLogic x:Name="controlLogic"/>
+    </UserControl.DataContext>
+    <TextBlock Text="{Binding ExampleText}" HorizontalAlignment="Center"/>
+</UserControl>
