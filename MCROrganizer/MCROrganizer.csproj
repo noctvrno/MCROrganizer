@@ -67,6 +67,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\Commands\MCROrganizerCommands.cs" />
     <Compile Include="Core\ViewModel\MCROrganizerControlLogic.cs" />
     <Compile Include="Core\View\MCROrganizerControl.xaml.cs">
       <DependentUpon>MCROrganizerControl.xaml</DependentUpon>
