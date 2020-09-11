@@ -20,9 +20,40 @@ namespace MCROrganizer.Core.View
     /// </summary>
     public partial class MainControl : UserControl
     {
+        private Control draggedItem = null;
+        private Point itemRelativePosition = new Point();
+        private Boolean isDragging = false;
+
         public MainControl()
         {
             InitializeComponent();
+            isDragging = false;
+        }
+
+        private void btn_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            isDragging = true;
+            draggedItem = (Button)sender;
+            itemRelativePosition = e.GetPosition(draggedItem);
+        }
+
+        private void btn_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!isDragging)
+                return;
+
+            isDragging = false;
+        }
+
+        private void btn_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (!isDragging)
+                return;
+
+            Point canvasRelativePosition = e.GetPosition(MyCanvas);
+
+            Canvas.SetTop(draggedItem, canvasRelativePosition.Y - itemRelativePosition.Y);
+            Canvas.SetLeft(draggedItem, canvasRelativePosition.X - itemRelativePosition.X);
         }
     }
 }

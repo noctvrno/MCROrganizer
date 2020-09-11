@@ -13,7 +13,7 @@ namespace MCROrganizer.Core.ViewModel
     public class ControlLogic
     {
         #region Data Members
-        private ObservableCollection<Button> challengeRunGames = new ObservableCollection<Button>()
+        private ObservableCollection<Button> _challengeRunGames = new ObservableCollection<Button>()
         {
             new Button() { Content = "First Button"},
             new Button() { Content = "Second Button"}
@@ -30,8 +30,8 @@ namespace MCROrganizer.Core.ViewModel
         #region Accessors
         public ObservableCollection<Button> ChallengeRunGames
         {
-            get => challengeRunGames;
-            set => challengeRunGames = value;
+            get => _challengeRunGames;
+            set => _challengeRunGames = value;
         }
         #endregion
     }

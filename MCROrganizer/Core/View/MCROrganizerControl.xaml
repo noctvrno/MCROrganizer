@@ -27,6 +27,8 @@
                 </Style>
             </ItemsControl.Style>
         </ItemsControl>
-        <Button Content="Add Buttons" HorizontalAlignment="Center" VerticalAlignment="Top" Command="{Binding AddGameToChallengeRunCommand}"/>
+        <Canvas x:Name="MyCanvas" Width="200" Height="100">
+            <Button x:Name="MyButton" Content="Add Buttons" PreviewMouseLeftButtonUp="btn_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="btn_PreviewMouseLeftButtonDown" PreviewMouseMove="btn_PreviewMouseMove" HorizontalAlignment="Center" VerticalAlignment="Top" Command="{Binding AddGameToChallengeRunCommand}"/>
+        </Canvas>
     </StackPanel>
 </UserControl>
