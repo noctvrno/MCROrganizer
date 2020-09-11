@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MCROrganizer.Core.View"
              xmlns:viewModel ="clr-namespace:MCROrganizer.Core.ViewModel"
+             xmlns:custom ="clr-namespace:MCROrganizer.Core.CustomControls"
              mc:Ignorable="d" 
              Width="400"
              Height="800"
@@ -27,8 +28,6 @@
                 </Style>
             </ItemsControl.Style>
         </ItemsControl>
-        <Canvas x:Name="MyCanvas" Width="200" Height="100">
-            <Button x:Name="MyButton" Content="Add Buttons" PreviewMouseLeftButtonUp="btn_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="btn_PreviewMouseLeftButtonDown" PreviewMouseMove="btn_PreviewMouseMove" HorizontalAlignment="Center" VerticalAlignment="Top" Command="{Binding AddGameToChallengeRunCommand}"/>
-        </Canvas>
+        <custom:DraggableButton />
     </StackPanel>
 </UserControl>

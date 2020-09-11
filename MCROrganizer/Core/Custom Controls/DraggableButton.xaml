@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="MCROrganizer.Core.CustomControls.DraggableButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MCROrganizer.Core.CustomControls"
+             mc:Ignorable="d"
+             Height="Auto"
+             Width="Auto">
+    <Canvas x:Name="MyCanvas" Width="{Binding ElementName=MyButton, Path=Width}" Height="{Binding ElementName=MyButton, Path=Height}">
+        <Button x:Name="MyButton" Content="Test" Width="50" Height="50" PreviewMouseLeftButtonUp="OnButtonPreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="OnButtonPreviewMouseLeftButtonDown" PreviewMouseMove="OnButtonPreviewMouseMove" HorizontalAlignment="Center" VerticalAlignment="Top" Command="{Binding AddGameToChallengeRunCommand}"/>
+    </Canvas>
+</UserControl>

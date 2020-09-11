@@ -7,32 +7,29 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using MCROrganizer.Core.Commands;
+using MCROrganizer.Core.CustomControls;
 
 namespace MCROrganizer.Core.ViewModel
 {
     public class ControlLogic
     {
         #region Data Members
-        private ObservableCollection<Button> _challengeRunGames = new ObservableCollection<Button>()
+        private ObservableCollection<DraggableButton> _challengeRunGames = new ObservableCollection<DraggableButton>();
+        #endregion
+
+        #region Accessors
+        public ObservableCollection<DraggableButton> ChallengeRunGames
         {
-            new Button() { Content = "First Button"},
-            new Button() { Content = "Second Button"}
-        };
+            get => _challengeRunGames;
+            set => _challengeRunGames = value;
+        }
         #endregion
 
         #region Commands
         public ICommand AddGameToChallengeRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj =>
         {
-            ChallengeRunGames.Add(new Button() { Content = "Button added dynamically" });
+            ChallengeRunGames.Add(new DraggableButton());
         }));
-        #endregion
-
-        #region Accessors
-        public ObservableCollection<Button> ChallengeRunGames
-        {
-            get => _challengeRunGames;
-            set => _challengeRunGames = value;
-        }
         #endregion
     }
 }
