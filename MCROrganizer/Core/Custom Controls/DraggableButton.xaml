@@ -7,7 +7,36 @@
              mc:Ignorable="d"
              Height="Auto"
              Width="Auto">
+    <UserControl.Resources>
+        <!-- This style is used for buttons, to remove the WPF default 'animated' mouse over effect -->
+        <Style x:Key="GameButtonStyle" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" BorderThickness="2" BorderBrush="Black" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="Black" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Width" Value="{Binding Width}" />
+            <Setter Property="Height" Value="{Binding Height}" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+    </UserControl.Resources>
     <Canvas x:Name="MyCanvas" Width="{Binding ElementName=MyButton, Path=Width}" Height="{Binding ElementName=MyButton, Path=Height}">
-        <Button x:Name="MyButton" Content="Test" Width="50" Height="50" PreviewMouseLeftButtonUp="OnButtonPreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="OnButtonPreviewMouseLeftButtonDown" PreviewMouseMove="OnButtonPreviewMouseMove" HorizontalAlignment="Center" VerticalAlignment="Top" Command="{Binding AddGameToChallengeRunCommand}"/>
+        <Button x:Name="MyButton" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Style="{StaticResource GameButtonStyle}" PreviewMouseLeftButtonUp="OnButtonPreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="OnButtonPreviewMouseLeftButtonDown" PreviewMouseMove="OnButtonPreviewMouseMove" HorizontalAlignment="Center" >
+            <Button.Content>
+                <Border HorizontalAlignment="Center" VerticalAlignment="Center" Width="{Binding ElementName=MyButton, Path=Width}" Height="{Binding ElementName=MyButton, Path=Height}">
+                    <Label Content="DS" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                </Border>
+            </Button.Content>
+        </Button>
     </Canvas>
 </UserControl>

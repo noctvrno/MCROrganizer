@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MCROrganizer.Core.ViewModel;
 
 namespace MCROrganizer.Core.CustomControls
 {
@@ -20,48 +21,78 @@ namespace MCROrganizer.Core.CustomControls
     /// Interaction logic for DraggableButton.xaml
     /// </summary>
     /// 
+
+    // Normally, this would act as a wrapper over the Button's and TextBox' (soon TM) properties in case we would like to use the control statically (instantiate in XAML code)
+    // The DraggableButton should only be used dynamically though (so no need to wrap a lot of properties).
+    // Whenever the DraggableButton is instantiated, we could always access its DataContext and get/set whatever bound property we would like.
     public class DraggableButtonDataContext
     {
-
+        #region Accessors
+        public Double Width { get; set; } = 50.0;
+        public Double Height { get; set; } = 50.0;
+        #endregion
     }
-
+    
     public partial class DraggableButton : UserControl
     {
-        private Control draggedItem = null;
-        private Point itemRelativePosition = new Point();
-        private Boolean isDragging = false;
+        #region Members
+        private Control _draggedItem = null;
+        private Point _itemRelativePosition = new Point();
+        private Boolean _isDragging = false;
+        private ControlLogic _parent = null;
+        private DraggableButtonDataContext _dataContext = null;
+        #endregion
 
-        public DraggableButton()
+        #region Accessors
+        public DraggableButtonDataContext DBDataContext => _dataContext;
+        #endregion
+
+
+        #region Initialization
+        public DraggableButton(ControlLogic parent)
         {
+            DataContext = _dataContext = new DraggableButtonDataContext();
             InitializeComponent();
-            isDragging = false;
+            _isDragging = false;
+            _parent = parent;
         }
+        #endregion
 
         #region Event handlers
         private void OnButtonPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            isDragging = true;
-            draggedItem = (Button)sender;
-            itemRelativePosition = e.GetPosition(draggedItem);
+            _isDragging = true;
+            _draggedItem = (Button)sender;
+            _itemRelativePosition = e.GetPosition(_draggedItem);
         }
 
         private void OnButtonPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (!isDragging)
+            if (!_isDragging)
                 return;
 
-            isDragging = false;
+            _isDragging = false;
         }
 
         private void OnButtonPreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (!isDragging)
+            if (!_isDragging)
                 return;
 
             Point canvasRelativePosition = e.GetPosition(MyCanvas);
 
-            Canvas.SetTop(draggedItem, canvasRelativePosition.Y - itemRelativePosition.Y);
-            Canvas.SetLeft(draggedItem, canvasRelativePosition.X - itemRelativePosition.X);
+            Canvas.SetTop(_draggedItem, canvasRelativePosition.Y - _itemRelativePosition.Y);
+            Canvas.SetLeft(_draggedItem, canvasRelativePosition.X - _itemRelativePosition.X);
+        }
+
+        public void SetAbscissaValue(Double abscissaValue)
+        {
+            Canvas.SetLeft(this, abscissaValue);
+            
+            //if (parent.dictionary.TryGetValue(...))
+            //    // update position.
+            //else
+            //    parent.dictionary.Add(...)
         }
         #endregion
     }

@@ -23,6 +23,7 @@ namespace MCROrganizer.Core.View
     {
         public MainControl()
         {
+            DataContext = new MCROrganizer.Core.ViewModel.ControlLogic(this);
             InitializeComponent();
         }
     }
