@@ -23,6 +23,7 @@ namespace MCROrganizer.Core.ViewModel
         public ObservableCollection<DraggableButton> Games { get; set; } = new ObservableCollection<DraggableButton>();
 
         public Dictionary<DraggableButton, Double> GamesRelativeAbscissa { get; set; } = new Dictionary<DraggableButton, Double>();
+        public MCROrganizer.Core.View.MainControl MainControl => _userControl;
         #endregion
 
         public ControlLogic(MCROrganizer.Core.View.MainControl userControl) => _userControl = userControl;
@@ -33,8 +34,9 @@ namespace MCROrganizer.Core.ViewModel
             var newGame = new DraggableButton(this);
             Point relativeLocation = newGame.TranslatePoint(new Point(0, 0), VisualTreeHelper.GetParent(newGame) as Canvas);
             Games.Add(newGame);
-            Canvas.SetLeft(newGame, relativeLocation.X + newGame.DBDataContext.Width * (Games.Count - 1));
-            GamesRelativeAbscissa.Add(newGame, relativeLocation.X);
+            newGame.ItemRelativeToParentAbscissa = relativeLocation.X + newGame.DBDataContext.Width * (Games.Count - 1);
+            DraggableButton.TranslateItemHorizontally(newGame, newGame.ItemRelativeToParentAbscissa);
+            GamesRelativeAbscissa.Add(newGame, newGame.ItemRelativeToParentAbscissa);
         }));
         #endregion
     }

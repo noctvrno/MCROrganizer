@@ -30,8 +30,8 @@
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
     </UserControl.Resources>
-    <Canvas x:Name="MyCanvas" Width="{Binding ElementName=MyButton, Path=Width}" Height="{Binding ElementName=MyButton, Path=Height}">
-        <Button x:Name="MyButton" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Style="{StaticResource GameButtonStyle}" PreviewMouseLeftButtonUp="OnButtonPreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="OnButtonPreviewMouseLeftButtonDown" PreviewMouseMove="OnButtonPreviewMouseMove" HorizontalAlignment="Center" >
+    <Canvas Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=MyButton, Path=Height}">
+        <Button x:Name="gameButton" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Style="{StaticResource GameButtonStyle}" PreviewMouseLeftButtonUp="OnButtonPreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="OnButtonPreviewMouseLeftButtonDown" PreviewMouseMove="OnButtonPreviewMouseMove" HorizontalAlignment="Center" >
             <Button.Content>
                 <Border HorizontalAlignment="Center" VerticalAlignment="Center" Width="{Binding ElementName=MyButton, Path=Width}" Height="{Binding ElementName=MyButton, Path=Height}">
                     <Label Content="DS" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />

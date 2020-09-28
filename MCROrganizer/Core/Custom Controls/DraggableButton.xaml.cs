@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MCROrganizer.Core.ViewModel;
+using MCROrganizer.Core.View;
 
 namespace MCROrganizer.Core.CustomControls
 {
@@ -37,7 +38,8 @@ namespace MCROrganizer.Core.CustomControls
     {
         #region Members
         private Control _draggedItem = null;
-        private Point _itemRelativePosition = new Point();
+        private Double _mouseRelativeToItemAbscissa = 0.0;
+        private Double _itemRelativeToParentAbscissa = 0.0; // Parent means the ItemsControl.
         private Boolean _isDragging = false;
         private ControlLogic _parent = null;
         private DraggableButtonDataContext _dataContext = null;
@@ -45,6 +47,11 @@ namespace MCROrganizer.Core.CustomControls
 
         #region Accessors
         public DraggableButtonDataContext DBDataContext => _dataContext;
+        public Double ItemRelativeToParentAbscissa
+        {
+            get => _itemRelativeToParentAbscissa;
+            set => _itemRelativeToParentAbscissa = value;
+        }
         #endregion
 
 
@@ -63,7 +70,7 @@ namespace MCROrganizer.Core.CustomControls
         {
             _isDragging = true;
             _draggedItem = (Button)sender;
-            _itemRelativePosition = e.GetPosition(_draggedItem);
+            _mouseRelativeToItemAbscissa = e.GetPosition(_draggedItem).X;
         }
 
         private void OnButtonPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -79,20 +86,14 @@ namespace MCROrganizer.Core.CustomControls
             if (!_isDragging)
                 return;
 
-            Point canvasRelativePosition = e.GetPosition(MyCanvas);
-
-            Canvas.SetTop(_draggedItem, canvasRelativePosition.Y - _itemRelativePosition.Y);
-            Canvas.SetLeft(_draggedItem, canvasRelativePosition.X - _itemRelativePosition.X);
+            Point mouseRelativeToItemsControlPosition = e.GetPosition((_parent.MainControl as MainControl).buttonsItemsControl);
+            System.Diagnostics.Debug.WriteLine(mouseRelativeToItemsControlPosition);
+            TranslateItemHorizontally(_draggedItem, mouseRelativeToItemsControlPosition.X - _itemRelativeToParentAbscissa - _mouseRelativeToItemAbscissa);
         }
 
-        public void SetAbscissaValue(Double abscissaValue)
+        public static void TranslateItemHorizontally(Control itemToTranslate, Double abscissaValue)
         {
-            Canvas.SetLeft(this, abscissaValue);
-            
-            //if (parent.dictionary.TryGetValue(...))
-            //    // update position.
-            //else
-            //    parent.dictionary.Add(...)
+            Canvas.SetLeft(itemToTranslate, abscissaValue);
         }
         #endregion
     }
