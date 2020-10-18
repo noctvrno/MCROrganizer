@@ -36,8 +36,10 @@ namespace MCROrganizer.Core.ViewModel
         {
             var newGame = new DraggableButton(this);
             Point relativeLocation = newGame.TranslatePoint(new Point(0, 0), VisualTreeHelper.GetParent(newGame) as Canvas);
+            Double gameSpacing = 10.0;
             Games.Add(newGame);
-            newGame.TranslateItemHorizontally(newGame, relativeLocation.X + newGame.DBDataContext.Width * (Games.Count - 1));
+            // Translate the item accordingly and shift the pivot point to the middle of the button.
+            newGame.TranslateItemHorizontally(newGame, relativeLocation.X + (newGame.DBDataContext.Width + gameSpacing) * (Games.Count - 1));
             GamesRelativeAbscissa.Add(newGame, newGame.ItemRelativeToParentAbscissa);
             StandardPositionVacancy.Add((newGame.ItemRelativeToParentAbscissa, false));
         }));
