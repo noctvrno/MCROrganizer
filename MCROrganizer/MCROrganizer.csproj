@@ -75,6 +75,7 @@
     <Compile Include="Core\Custom Controls\DraggableButton.xaml.cs">
       <DependentUpon>DraggableButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Core\Extensions\DoubleExtensions.cs" />
     <Compile Include="Core\ViewModel\MCROrganizerControlLogic.cs" />
     <Compile Include="Core\View\MCROrganizerControl.xaml.cs">
       <DependentUpon>MCROrganizerControl.xaml</DependentUpon>

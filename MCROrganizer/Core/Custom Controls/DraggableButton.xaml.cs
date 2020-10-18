@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MCROrganizer.Core.ViewModel;
 using MCROrganizer.Core.View;
+using MCROrganizer.Core.Extensions;
 
 namespace MCROrganizer.Core.CustomControls
 {
@@ -37,9 +38,8 @@ namespace MCROrganizer.Core.CustomControls
     public partial class DraggableButton : UserControl
     {
         #region Members
-        private Control _draggedItem = null;
         private Double _mouseRelativeToItemAbscissa = 0.0;
-        private Double _itemRelativeToParentAbscissa = 0.0; // Parent means the ItemsControl.
+        private Double _itemRelativeToParentAbscissa = 0.0; // Parent means the ItemsControl defined in the main view.
         private Boolean _isDragging = false;
         private ControlLogic _parent = null;
         private DraggableButtonDataContext _dataContext = null;
@@ -53,7 +53,6 @@ namespace MCROrganizer.Core.CustomControls
             set => _itemRelativeToParentAbscissa = value;
         }
         #endregion
-
 
         #region Initialization
         public DraggableButton(ControlLogic parent)
@@ -69,14 +68,22 @@ namespace MCROrganizer.Core.CustomControls
         private void OnButtonPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _isDragging = true;
-            _draggedItem = (Button)sender;
-            _mouseRelativeToItemAbscissa = e.GetPosition(_draggedItem).X;
+            _mouseRelativeToItemAbscissa = e.GetPosition(this).X;
         }
 
         private void OnButtonPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (!_isDragging)
                 return;
+
+            // Find a vacant position and move it there.
+            try
+            {
+                var vacantPositionItem = _parent.StandardPositionVacancy[_parent.StandardPositionVacancy.FindIndex(x => x.vacancy == true)];
+                TranslateItemHorizontally(this, vacantPositionItem.abscissa);
+                vacantPositionItem.vacancy = false;
+            }
+            catch { }
 
             _isDragging = false;
         }
@@ -86,14 +93,38 @@ namespace MCROrganizer.Core.CustomControls
             if (!_isDragging)
                 return;
 
+            // Get the position of the mouse relative to the control.
             Point mouseRelativeToItemsControlPosition = e.GetPosition((_parent.MainControl as MainControl).buttonsItemsControl);
+
+            // Try finding the dragged control in the dictionary and get its position.
+            _parent.GamesRelativeAbscissa.TryGetValue(this, out var draggedButtonPosition);
+
+            // Search for a possible collision.
+            var collidedControlEntry = _parent.GamesRelativeAbscissa.FirstOrDefault(x => x.Key != this && x.Value.IsInRange(mouseRelativeToItemsControlPosition.X, DBDataContext.Width));
+            System.Diagnostics.Debug.WriteLine("Collided with: " + collidedControlEntry);
+
+            if (collidedControlEntry.Key != null && _parent.GamesRelativeAbscissa.TryGetValue(collidedControlEntry.Key, out var collidedButtonPosition))
+            {
+                TranslateItemHorizontally(collidedControlEntry.Key, draggedButtonPosition);
+
+                // Mark the position as vacant.
+                Int32 collidedItemIndex = _parent.StandardPositionVacancy.FindIndex(x => x.abscissa == collidedButtonPosition);
+                _parent.StandardPositionVacancy[collidedItemIndex] = (collidedButtonPosition, true);
+            }
+
             System.Diagnostics.Debug.WriteLine(mouseRelativeToItemsControlPosition);
-            TranslateItemHorizontally(_draggedItem, mouseRelativeToItemsControlPosition.X - _itemRelativeToParentAbscissa - _mouseRelativeToItemAbscissa);
+            Canvas.SetLeft(this, mouseRelativeToItemsControlPosition.X - _itemRelativeToParentAbscissa - _mouseRelativeToItemAbscissa);
         }
 
-        public static void TranslateItemHorizontally(Control itemToTranslate, Double abscissaValue)
+        // This method translates the control horizontally and updates its abscissa in the main data structure.
+        public void TranslateItemHorizontally(DraggableButton itemToTranslate, Double abscissaValue)
         {
             Canvas.SetLeft(itemToTranslate, abscissaValue);
+            _itemRelativeToParentAbscissa = abscissaValue;
+
+            // Update dictionary value of the translated item.
+            if (_parent.GamesRelativeAbscissa.TryGetValue(itemToTranslate, out _))
+                _parent.GamesRelativeAbscissa[itemToTranslate] = abscissaValue;
         }
         #endregion
     }
