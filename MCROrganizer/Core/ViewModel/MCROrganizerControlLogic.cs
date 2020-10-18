@@ -22,7 +22,6 @@ namespace MCROrganizer.Core.ViewModel
 
         #region Accessors
         public Dictionary<DraggableButton, Double> GamesRelativeAbscissa { get; set; } = new Dictionary<DraggableButton, Double>();
-        public List<(Double abscissa, Boolean vacancy)> StandardPositionVacancy { get; set; } = new List<(Double abscissa, Boolean vacancy)>();
         public ObservableCollection<DraggableButton> Games { get; set; } = new ObservableCollection<DraggableButton>();
         public MainControl MainControl => _userControl;
         #endregion
@@ -35,13 +34,13 @@ namespace MCROrganizer.Core.ViewModel
         public ICommand AddGameToChallengeRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj =>
         {
             var newGame = new DraggableButton(this);
+            Games.Add(newGame);
             Point relativeLocation = newGame.TranslatePoint(new Point(0, 0), VisualTreeHelper.GetParent(newGame) as Canvas);
             Double gameSpacing = 10.0;
-            Games.Add(newGame);
+            Double newGameAbscissaValue = relativeLocation.X + (newGame.DBDataContext.Width + gameSpacing) * (Games.Count - 1);
             // Translate the item accordingly and shift the pivot point to the middle of the button.
-            newGame.TranslateItemHorizontally(newGame, relativeLocation.X + (newGame.DBDataContext.Width + gameSpacing) * (Games.Count - 1));
-            GamesRelativeAbscissa.Add(newGame, newGame.ItemRelativeToParentAbscissa);
-            StandardPositionVacancy.Add((newGame.ItemRelativeToParentAbscissa, false));
+            newGame.TranslateItemHorizontally(newGame, newGameAbscissaValue);
+            GamesRelativeAbscissa.Add(newGame, newGameAbscissaValue);
         }));
         #endregion
     }

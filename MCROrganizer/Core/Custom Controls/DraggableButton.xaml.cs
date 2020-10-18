@@ -39,7 +39,6 @@ namespace MCROrganizer.Core.CustomControls
     {
         #region Members
         private Double _mouseRelativeToItemAbscissa = 0.0;
-        private Double _itemRelativeToParentAbscissa = 0.0; // Parent means the ItemsControl defined in the main view.
         private Boolean _isDragging = false;
         private ControlLogic _parent = null;
         private DraggableButtonDataContext _dataContext = null;
@@ -47,11 +46,6 @@ namespace MCROrganizer.Core.CustomControls
 
         #region Accessors
         public DraggableButtonDataContext DBDataContext => _dataContext;
-        public Double ItemRelativeToParentAbscissa
-        {
-            get => _itemRelativeToParentAbscissa;
-            set => _itemRelativeToParentAbscissa = value;
-        }
         #endregion
 
         #region Initialization
@@ -76,15 +70,8 @@ namespace MCROrganizer.Core.CustomControls
             if (!_isDragging)
                 return;
 
-            // Find a vacant position and move it there.
-            try
-            {
-                Int32 vacantPositionIndex = _parent.StandardPositionVacancy.FindIndex(x => x.vacancy == true);
-                Double vacantPositionAbscissa = _parent.StandardPositionVacancy[vacantPositionIndex].abscissa;
-                TranslateItemHorizontally(this, vacantPositionAbscissa);
-                _parent.StandardPositionVacancy[vacantPositionIndex] = (vacantPositionAbscissa, false);
-            }
-            catch { }
+            if (_parent.GamesRelativeAbscissa.TryGetValue(this, out Double draggedItemAbscissaValue))
+                TranslateItemHorizontally(this, draggedItemAbscissaValue);
 
             _isDragging = false;
         }
@@ -97,39 +84,18 @@ namespace MCROrganizer.Core.CustomControls
             // Get the position of the mouse relative to the control.
             Point mouseRelativeToItemsControlPosition = e.GetPosition((_parent.MainControl as MainControl).buttonsItemsControl);
 
-            // Try finding the dragged control in the dictionary, get its position and mark it as vacant.
-            Double draggedButtonPosition = 0.0;
-            Int32 draggedItemIndex = -1;
-            if (_parent.GamesRelativeAbscissa.TryGetValue(this, out draggedButtonPosition))
-            {
-                draggedItemIndex = _parent.StandardPositionVacancy.FindIndex(x => x.abscissa == draggedButtonPosition);
-                _parent.StandardPositionVacancy[draggedItemIndex] = (draggedButtonPosition, true);
-            }
-
-            // Search for a possible collision.
+            // Search for a possible collision and swap the items.
             var collidedControlEntry = _parent.GamesRelativeAbscissa.FirstOrDefault(x => x.Key != this && mouseRelativeToItemsControlPosition.X.IsInRange(x.Value + DBDataContext.Width / 2, DBDataContext.Width / 2));
             if (collidedControlEntry.Key != null && _parent.GamesRelativeAbscissa.TryGetValue(collidedControlEntry.Key, out var collidedButtonPosition))
-            {
                 SwapDraggedItemOnCollision(collidedControlEntry.Key);
-
-                // Find the index of the standard position of the button we just collided with.
-                Int32 collidedItemIndex = _parent.StandardPositionVacancy.FindIndex(x => x.abscissa == collidedButtonPosition);
-
-                // Mark the found position as vacant in the standard position list (vacancy update).
-                _parent.StandardPositionVacancy[collidedItemIndex] = (collidedButtonPosition, true);
-
-                // Mark the entry position (of the current dragged button) as non-vacant.
-                _parent.StandardPositionVacancy[draggedItemIndex] = (draggedButtonPosition, false);
-            }
 
             Canvas.SetLeft(this, mouseRelativeToItemsControlPosition.X - _mouseRelativeToItemAbscissa);
         }
 
-        // This method translates the control horizontally and updates its abscissa in the main data structure.
+        // This method translates the control horizontally.
         public void TranslateItemHorizontally(DraggableButton itemToTranslate, Double abscissaValue)
         {
             Canvas.SetLeft(itemToTranslate, abscissaValue);
-            _itemRelativeToParentAbscissa = abscissaValue;
         }
 
         // This method moves the collidedItem to the draggedItem position and updates the dictionary according to the swap.
