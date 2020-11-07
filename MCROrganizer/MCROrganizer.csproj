@@ -76,6 +76,8 @@
       <DependentUpon>DraggableButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="Core\Extensions\DoubleExtensions.cs" />
+    <Compile Include="Core\Utils\AttachedProperties.cs" />
+    <Compile Include="Core\Utils\UserControlDataContext.cs" />
     <Compile Include="Core\ViewModel\MCROrganizerControlLogic.cs" />
     <Compile Include="Core\View\MCROrganizerControl.xaml.cs">
       <DependentUpon>MCROrganizerControl.xaml</DependentUpon>
@@ -111,6 +113,5 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

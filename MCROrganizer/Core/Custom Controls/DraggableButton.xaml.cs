@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using MCROrganizer.Core.ViewModel;
 using MCROrganizer.Core.View;
 using MCROrganizer.Core.Extensions;
+using MCROrganizer.Core.Utils;
 
 namespace MCROrganizer.Core.CustomControls
 {
@@ -27,11 +28,46 @@ namespace MCROrganizer.Core.CustomControls
     // Normally, this would act as a wrapper over the Button's and TextBox' (soon TM) properties in case we would like to use the control statically (instantiate in XAML code)
     // The DraggableButton should only be used dynamically though (so no need to wrap a lot of properties).
     // Whenever the DraggableButton is instantiated, we could always access its DataContext and get/set whatever bound property we would like.
-    public class DraggableButtonDataContext
+    public class DraggableButtonDataContext : UserControlDataContext
     {
+        #region Members
+        private String _name = "DS";
+        private Boolean _isHitTestVisible = false;
+        private Boolean _isFocused = false;
+        #endregion
+
         #region Accessors
         public Double Width { get; set; } = 50.0;
         public Double Height { get; set; } = 50.0;
+        public String Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                NotifyPropertyChanged("Name");
+            }
+        }
+
+        public Boolean IsHitTestVisible
+        {
+            get => _isHitTestVisible;
+            set
+            {
+                _isHitTestVisible = value;
+                NotifyPropertyChanged("IsHitTestVisible");
+            }
+        }
+
+        public Boolean IsFocused
+        {
+            get => _isFocused;
+            set
+            {
+                _isFocused = value;
+                NotifyPropertyChanged("IsFocused");
+            }
+        }
         #endregion
     }
     
@@ -89,9 +125,23 @@ namespace MCROrganizer.Core.CustomControls
             if (collidedControlEntry.Key != null && _parent.GamesRelativeAbscissa.TryGetValue(collidedControlEntry.Key, out var collidedButtonPosition))
                 SwapDraggedItemOnCollision(collidedControlEntry.Key);
 
-            Canvas.SetLeft(this, mouseRelativeToItemsControlPosition.X - _mouseRelativeToItemAbscissa);
+            TranslateItemHorizontally(this, mouseRelativeToItemsControlPosition.X - _mouseRelativeToItemAbscissa);
         }
 
+        private void OnLabelPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            DBDataContext.IsHitTestVisible = true;
+            DBDataContext.IsFocused = true;
+        }
+
+        private void OnTextBoxLostFocus(object sender, RoutedEventArgs e)
+        {
+            DBDataContext.IsHitTestVisible = false;
+            DBDataContext.IsFocused = false;
+        }
+        #endregion
+
+        #region Helper methods
         // This method translates the control horizontally.
         public void TranslateItemHorizontally(DraggableButton itemToTranslate, Double abscissaValue)
         {

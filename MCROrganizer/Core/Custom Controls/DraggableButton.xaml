@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MCROrganizer.Core.CustomControls"
+             xmlns:attached="clr-namespace:MCROrganizer.Core.Utils"
              mc:Ignorable="d"
              Height="Auto"
              Width="Auto">
@@ -30,12 +31,13 @@
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
     </UserControl.Resources>
-    <Canvas Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=MyButton, Path=Height}">
+    <Canvas Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}">
         <Button x:Name="gameButton" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Style="{StaticResource GameButtonStyle}" PreviewMouseLeftButtonUp="OnButtonPreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="OnButtonPreviewMouseLeftButtonDown" PreviewMouseMove="OnButtonPreviewMouseMove" HorizontalAlignment="Center" >
             <Button.Content>
-                <Border HorizontalAlignment="Center" VerticalAlignment="Center" Width="{Binding ElementName=MyButton, Path=Width}" Height="{Binding ElementName=MyButton, Path=Height}">
-                    <Label Content="DS" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
-                </Border>
+                <Canvas VerticalAlignment="Center" HorizontalAlignment="Center" Width="{Binding Width}" Height="{Binding Height}" >
+                    <Label Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" PreviewMouseWheel="OnLabelPreviewMouseWheel"/>
+                    <TextBox Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" attached:TextBoxProperties.IsFocused="{Binding IsFocused}" IsHitTestVisible="{Binding IsHitTestVisible}" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" Text="{Binding Name, Mode=TwoWay}" LostFocus="OnTextBoxLostFocus" />
+                </Canvas>
             </Button.Content>
         </Button>
     </Canvas>
