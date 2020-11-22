@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace MCROrganizer.Core.Utils
 {
+    #region TextBox Properties
     public class TextBoxProperties
     {
         public static DependencyProperty IsFocusedProperty = DependencyProperty.RegisterAttached("IsFocused", typeof(bool), typeof(TextBoxProperties), new UIPropertyMetadata(false, OnIsFocusedChanged));
@@ -31,4 +34,5 @@ namespace MCROrganizer.Core.Utils
             }
         }
     }
+    #endregion
 }

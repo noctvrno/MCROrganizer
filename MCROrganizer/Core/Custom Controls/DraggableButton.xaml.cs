@@ -30,15 +30,9 @@ namespace MCROrganizer.Core.CustomControls
     // Whenever the DraggableButton is instantiated, we could always access its DataContext and get/set whatever bound property we would like.
     public class DraggableButtonDataContext : UserControlDataContext
     {
-        #region Members
+        #region Customization Properties
+        // Run name.
         private String _name = "DS";
-        private Boolean _isHitTestVisible = false;
-        private Boolean _isFocused = false;
-        #endregion
-
-        #region Accessors
-        public Double Width { get; set; } = 50.0;
-        public Double Height { get; set; } = 50.0;
         public String Name
         {
             get => _name;
@@ -49,6 +43,40 @@ namespace MCROrganizer.Core.CustomControls
             }
         }
 
+        // State of the run.
+        private RunState _runState = RunState.Pending;
+        public RunState RunState
+        {
+            get => _runState;
+            set
+            {
+                _runState = value;
+                NotifyPropertyChanged("RunState");
+                NotifyPropertyChanged("RunStateColor");
+            }
+        }
+        public SolidColorBrush RunStateColor
+        {
+            get
+            {
+                return _runState switch
+                {
+                    RunState.Pending => new SolidColorBrush(Colors.Red),
+                    RunState.InProgress => new SolidColorBrush(Colors.Yellow),
+                    RunState.Finished => new SolidColorBrush(Colors.Green),
+                    RunState _ => throw new NotSupportedException("Unreachable")
+                };
+            }
+        }
+
+        // Width and height (hardcoded for now, might be changed into a two-way databinding in the future).
+        public Double Width { get; set; } = 50.0;
+        public Double Height { get; set; } = 50.0;
+        #endregion
+
+        #region Two-Way Helper DataBinding Properties
+        // Controls whether the button can be interacted with or not.
+        private Boolean _isHitTestVisible = false;
         public Boolean IsHitTestVisible
         {
             get => _isHitTestVisible;
@@ -59,6 +87,8 @@ namespace MCROrganizer.Core.CustomControls
             }
         }
 
+        // Changes the focus to the button and highlights the text within it.
+        private Boolean _isFocused = false;
         public Boolean IsFocused
         {
             get => _isFocused;
@@ -68,9 +98,32 @@ namespace MCROrganizer.Core.CustomControls
                 NotifyPropertyChanged("IsFocused");
             }
         }
+
+        // Rename run command.
+        private static ImageSource _renameRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "RenameRun.png"));
+        public ImageSource RenameRunImage => _renameRunImage;
+        public ICommand RenameRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => MakeButtonEditable()));
+
+        // Set run as current command.
+        private static ImageSource _setCurrentRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SetCurrentRun.png"));
+        public ImageSource SetCurrentRunImage => _setCurrentRunImage;
+        public ICommand SetCurrentRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => MakeButtonEditable()));
         #endregion
+
+        #region Communication fields
+        private DraggableButton _control = null;
+        #endregion
+
+        #region Helper methods
+        public void MakeButtonEditable(Boolean isEditable = true)
+        {
+            IsHitTestVisible = IsFocused = isEditable;
+        }
+        #endregion
+
+        public DraggableButtonDataContext(DraggableButton control) => _control = control;
     }
-    
+
     public partial class DraggableButton : UserControl
     {
         #region Members
@@ -87,7 +140,7 @@ namespace MCROrganizer.Core.CustomControls
         #region Initialization
         public DraggableButton(ControlLogic parent)
         {
-            DataContext = _dataContext = new DraggableButtonDataContext();
+            DataContext = _dataContext = new DraggableButtonDataContext(this);
             InitializeComponent();
             _isDragging = false;
             _parent = parent;
@@ -106,8 +159,8 @@ namespace MCROrganizer.Core.CustomControls
             if (!_isDragging)
                 return;
 
-            if (_parent.GamesRelativeAbscissa.TryGetValue(this, out Double draggedItemAbscissaValue))
-                TranslateItemHorizontally(this, draggedItemAbscissaValue);
+            if (_parent.AbscissaByRun.TryGetValue(this, out Double draggedItemAbscissaValue))
+                _parent.TranslateItemHorizontally(this, draggedItemAbscissaValue);
 
             _isDragging = false;
         }
@@ -121,46 +174,21 @@ namespace MCROrganizer.Core.CustomControls
             Point mouseRelativeToItemsControlPosition = e.GetPosition((_parent.MainControl as MainControl).buttonsItemsControl);
 
             // Search for a possible collision and swap the items.
-            var collidedControlEntry = _parent.GamesRelativeAbscissa.FirstOrDefault(x => x.Key != this && mouseRelativeToItemsControlPosition.X.IsInRange(x.Value + DBDataContext.Width / 2, DBDataContext.Width / 2));
-            if (collidedControlEntry.Key != null && _parent.GamesRelativeAbscissa.TryGetValue(collidedControlEntry.Key, out var collidedButtonPosition))
-                SwapDraggedItemOnCollision(collidedControlEntry.Key);
+            var collidedControlEntry = _parent.AbscissaByRun.FirstOrDefault(x => x.Key != this && mouseRelativeToItemsControlPosition.X.IsInRange(x.Value + DBDataContext.Width / 2, DBDataContext.Width / 2));
+            if (collidedControlEntry.Key != null && _parent.AbscissaByRun.TryGetValue(collidedControlEntry.Key, out var collidedButtonPosition))
+                _parent.SwapDraggedItemOnCollision(this, collidedControlEntry.Key);
 
-            TranslateItemHorizontally(this, mouseRelativeToItemsControlPosition.X - _mouseRelativeToItemAbscissa);
+            _parent.TranslateItemHorizontally(this, mouseRelativeToItemsControlPosition.X - _mouseRelativeToItemAbscissa);
         }
 
         private void OnLabelPreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            DBDataContext.IsHitTestVisible = true;
-            DBDataContext.IsFocused = true;
+            DBDataContext.MakeButtonEditable();
         }
 
         private void OnTextBoxLostFocus(object sender, RoutedEventArgs e)
         {
-            DBDataContext.IsHitTestVisible = false;
-            DBDataContext.IsFocused = false;
-        }
-        #endregion
-
-        #region Helper methods
-        // This method translates the control horizontally.
-        public void TranslateItemHorizontally(DraggableButton itemToTranslate, Double abscissaValue)
-        {
-            Canvas.SetLeft(itemToTranslate, abscissaValue);
-        }
-
-        // This method moves the collidedItem to the draggedItem position and updates the dictionary according to the swap.
-        private void SwapDraggedItemOnCollision(DraggableButton collidedItem)
-        {
-            // Update the dictionary so that the draggedItem has the collidedItem's position.
-            if (_parent.GamesRelativeAbscissa.TryGetValue(this, out Double draggedItemAbscissaValue) && _parent.GamesRelativeAbscissa.TryGetValue(collidedItem, out Double collidedItemAbscissaValue))
-            {
-                // Physically move the collideditem to the draggedItem standard position.
-                TranslateItemHorizontally(collidedItem, draggedItemAbscissaValue);
-
-                // Swap the values of the draggedItem and the collidedItem.
-                _parent.GamesRelativeAbscissa[this] = collidedItemAbscissaValue;
-                _parent.GamesRelativeAbscissa[collidedItem] = draggedItemAbscissaValue;
-            }
+            DBDataContext.MakeButtonEditable(false);
         }
         #endregion
     }

@@ -15,14 +15,9 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Name="border" BorderThickness="2" BorderBrush="Black" Background="{TemplateBinding Background}">
+                        <Border Name="border" BorderThickness="2" Background="{TemplateBinding Background}" BorderBrush="{Binding RunStateColor}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="Black" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -39,6 +34,20 @@
                     <TextBox Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" attached:TextBoxProperties.IsFocused="{Binding IsFocused}" IsHitTestVisible="{Binding IsHitTestVisible}" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" Text="{Binding Name, Mode=TwoWay}" LostFocus="OnTextBoxLostFocus" />
                 </Canvas>
             </Button.Content>
+            <Button.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Rename" Command="{Binding Path=PlacementTarget.DataContext.RenameRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Edit the name of this run.">
+                        <MenuItem.Icon>
+                            <Image Source="{Binding RenameRunImage}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Set Run as Current" Command="{Binding Path=PlacementTarget.DataContext.SetCurrentRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Set this run as the current one. The runs defined before it will be marked as finished.">
+                        <MenuItem.Icon>
+                            <Image Source="{Binding SetCurrentRunImage}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </Button.ContextMenu>
         </Button>
     </Canvas>
 </UserControl>
