@@ -1,4 +1,4 @@
-# Multiple Challenge Run Organizer
+# Multiple Challenge Run Organizer - MCRO
 
 Currently being developed by one person - that's me :) - using C# WPF. Below you'll have a short description of the tool, its use and some planned features.
 - MCRO is being primarily designed for challenge runners that stream their misfortune to a live audience.
