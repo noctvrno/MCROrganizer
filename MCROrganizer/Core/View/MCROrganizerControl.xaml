@@ -27,6 +27,6 @@
                 </Style>
             </ItemsControl.Style>
         </ItemsControl>
-        <Button Width="100" Margin="0 100 0 0" Height="50" Content="New Game" Command="{Binding AddGameToChallengeRunCommand}"/>
+        <Button Width="100" Margin="0 100 0 0" Height="50" Content="New Game" Command="{Binding AddRunCommand}"/>
     </StackPanel>
 </UserControl>

@@ -26,30 +26,27 @@ namespace MCROrganizer.Core.ViewModel
         #endregion
 
         #region Accessors
-        public Dictionary<DraggableButton, Double> AbscissaByRun { get; set; } = new Dictionary<DraggableButton, Double>();
-        public ObservableCollection<DraggableButton> Runs { get; set; } = new ObservableCollection<DraggableButton>();
+        public Dictionary<DraggableButton, Double> AbscissaByRun { get; }
+        public ObservableCollection<DraggableButton> Runs { get; }
+        public LinkedList<(Double abscissa, Int32 vacantIndex)> AbscissasInQueue { get; set; }
         public MainControl MainControl => _userControl;
         #endregion
 
         #region Initialization
-        public ControlLogic(MainControl userControl) => _userControl = userControl;
+        public ControlLogic(MainControl userControl)
+        {
+            _userControl = userControl;
+            AbscissaByRun = new Dictionary<DraggableButton, Double>();
+            Runs = new ObservableCollection<DraggableButton>();
+            AbscissasInQueue = new LinkedList<(Double abscissa, Int32 vacantIndex)>();
+        }
         #endregion
 
         #region Commands
-        public ICommand AddGameToChallengeRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj =>
-        {
-            var newGame = new DraggableButton(this);
-            Runs.Add(newGame);
-            Point relativeLocation = newGame.TranslatePoint(new Point(0, 0), VisualTreeHelper.GetParent(newGame) as Canvas);
-            Double gameSpacing = 10.0;
-            Double newGameAbscissaValue = relativeLocation.X + (newGame.DBDataContext.Width + gameSpacing) * (Runs.Count - 1);
-            // Translate the item accordingly and shift the pivot point to the middle of the button.
-            TranslateItemHorizontally(newGame, newGameAbscissaValue);
-            AbscissaByRun.Add(newGame, newGameAbscissaValue);
-        }));
+        public ICommand AddRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => AddRun()));
         #endregion
 
-        #region Helper methods
+        #region Functionality
         // This method translates the control horizontally.
         public void TranslateItemHorizontally(DraggableButton itemToTranslate, Double abscissaValue)
         {
@@ -72,7 +69,74 @@ namespace MCROrganizer.Core.ViewModel
                 // Swap the items in the observable collection as well. Due to the nature of this data structure, we cannot simply do a swap here.
                 // The Move method actually removes the entry and then re-inserts it (a bit of overhead).
                 Runs.Move(Runs.IndexOf(draggedItem), Runs.IndexOf(collidedItem));
+
+                SetAllRunsAsPending();
             }
+        }
+
+        public void SetRunAsCurrent(DraggableButton selectedRun)
+        {
+            Int32 selectedRunIndex = Runs.IndexOf(selectedRun);
+            selectedRun.DBDataContext.RunState = RunState.InProgress;
+
+            for (Int32 runIndex = 0; runIndex < Runs.Count; ++runIndex)
+            {
+                // Skip the selected run (already handled).
+                if (runIndex == selectedRunIndex)
+                    continue;
+
+                // Runs to the left of the current one will be considered finished and the ones to left are considered pending.
+                Runs[runIndex].DBDataContext.RunState = runIndex < selectedRunIndex ? RunState.Finished : RunState.Pending;
+            }
+        }
+
+        public void SetAllRunsAsPending()
+        {
+            // Firstly, find a run that is not pending.
+            if (Runs.Any(x => x.DBDataContext.RunState != RunState.Pending))
+            {
+                // Secondly, if we found one, then go through all of them and set them as pending until the user decides on a current run.
+                foreach (var run in Runs.Select(x => x.DBDataContext))
+                {
+                    run.RunState = RunState.Pending;
+                }
+            }
+        }
+
+        private void AddRun()
+        {
+            var newRun = new DraggableButton(this);
+            Double newRunAbscissaValue = 0.0;
+            Double spacing = 10.0;
+            Point relativeLocation = newRun.TranslatePoint(new Point(0, 0), VisualTreeHelper.GetParent(newRun) as Canvas);
+
+            if (AbscissasInQueue.Count > 0)
+            {
+                var queuedAbscissa = AbscissasInQueue.First();
+                Runs.Insert(queuedAbscissa.vacantIndex, newRun);
+                newRunAbscissaValue = queuedAbscissa.abscissa;
+                AbscissasInQueue.RemoveFirst();
+            }
+            else
+            {
+                Runs.Add(newRun);
+                newRunAbscissaValue = relativeLocation.X + (newRun.DBDataContext.Width + spacing) * (Runs.Count - 1);
+            }
+
+            // Translate the item accordingly and shift the pivot point to the middle of the button.
+            TranslateItemHorizontally(newRun, newRunAbscissaValue);
+            AbscissaByRun.Add(newRun, newRunAbscissaValue);
+        }
+
+        public void RemoveRun(DraggableButton deletedRun)
+        {
+            // Place the deleted position and its index in the linked list and sort it.
+            AbscissasInQueue.AddLast((AbscissaByRun[deletedRun], Runs.IndexOf(deletedRun)));
+            AbscissasInQueue = new LinkedList<(Double abscissa, Int32 vacantIndex)>(AbscissasInQueue.OrderBy(x => x.abscissa));
+
+            // Secondly, Remove the objects from the data structures.
+            Runs.Remove(deletedRun);
+            AbscissaByRun.Remove(deletedRun);
         }
         #endregion
     }

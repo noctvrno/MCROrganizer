@@ -26,6 +26,7 @@
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
     </UserControl.Resources>
+    <!-- Main canvas -->
     <Canvas Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}">
         <Button x:Name="gameButton" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Style="{StaticResource GameButtonStyle}" PreviewMouseLeftButtonUp="OnButtonPreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="OnButtonPreviewMouseLeftButtonDown" PreviewMouseMove="OnButtonPreviewMouseMove" HorizontalAlignment="Center" >
             <Button.Content>
@@ -36,11 +37,19 @@
             </Button.Content>
             <Button.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Rename" Command="{Binding Path=PlacementTarget.DataContext.RenameRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Edit the name of this run.">
+                    <!-- Delete Run command -->
+                    <MenuItem Header="Delete Run" Command="{Binding Path=PlacementTarget.DataContext.DeleteRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Delete this run.">
+                        <MenuItem.Icon>
+                            <Image Source="{Binding DeleteRunImage}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <!-- Rename command -->
+                    <MenuItem Header="Rename Run" Command="{Binding Path=PlacementTarget.DataContext.RenameRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Edit the name of this run.">
                         <MenuItem.Icon>
                             <Image Source="{Binding RenameRunImage}" />
                         </MenuItem.Icon>
                     </MenuItem>
+                    <!-- Set Run as Current command -->
                     <MenuItem Header="Set Run as Current" Command="{Binding Path=PlacementTarget.DataContext.SetCurrentRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Set this run as the current one. The runs defined before it will be marked as finished.">
                         <MenuItem.Icon>
                             <Image Source="{Binding SetCurrentRunImage}" />

@@ -121,5 +121,8 @@
   <ItemGroup>
     <Resource Include="Tools\Images\SetCurrentRun.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Tools\Images\DeleteRun.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -99,6 +99,11 @@ namespace MCROrganizer.Core.CustomControls
             }
         }
 
+        // Delete run command.
+        private static ImageSource _deleteRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "DeleteRun.png"));
+        public ImageSource DeleteRunImage => _deleteRunImage;
+        public ICommand DeleteRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.RemoveRun(_control)));
+
         // Rename run command.
         private static ImageSource _renameRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "RenameRun.png"));
         public ImageSource RenameRunImage => _renameRunImage;
@@ -107,7 +112,7 @@ namespace MCROrganizer.Core.CustomControls
         // Set run as current command.
         private static ImageSource _setCurrentRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SetCurrentRun.png"));
         public ImageSource SetCurrentRunImage => _setCurrentRunImage;
-        public ICommand SetCurrentRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => MakeButtonEditable()));
+        public ICommand SetCurrentRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.SetRunAsCurrent(_control)));
         #endregion
 
         #region Communication fields
@@ -135,6 +140,7 @@ namespace MCROrganizer.Core.CustomControls
 
         #region Accessors
         public DraggableButtonDataContext DBDataContext => _dataContext;
+        public ControlLogic DBParent => _parent;
         #endregion
 
         #region Initialization
