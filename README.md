@@ -4,7 +4,7 @@ Currently being developed by one person - that's me :) - using C# WPF. Below you
 - MCRO is being primarily designed for challenge runners that stream their misfortune to a live audience.
 - MCRO was designed to be captured in OBS and placed above existing splits.
 - MCRO is meant to ease the organization of multiple games that need to be completed in order to complete a run.
-- Streamers usually do this by having some photoshop templates that they edit everytime they complete a game (no-hit runners especially, as speedrunners do not bother with this because it is tedious and they just tend to plop every split into a huge list).
+- Streamers usually do this by having some photoshop templates that they edit everytime they complete a game (no-hit runners especially, as speedrunners do not bother with this because it is tedious and they just tend to plop every split into a huge list and it looks terrible).
 - MCRO represents each game by using rectangular shapes - I do understand that maybe some people might like triangles or other funny shapes... well, tough luck.
 - The tool will also contain features such as:
     - Simple tool => simple interface (no buttons or unnecessary dialogs, edit everything in one window), the user only needs to know how to left-click, right-click and drag and drop.
