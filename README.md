@@ -7,7 +7,7 @@ Currently being developed by one person - that's me :) - using C# WPF. Below you
 - Streamers usually do this by having some photoshop templates that they edit everytime they complete a game (no-hit runners especially, as speedrunners do not bother with this because it is tedious and they just tend to plop every split into a huge list and it looks terrible).
 - MCRO represents each game by using rectangular shapes - I do understand that maybe some people might like triangles or other funny shapes... well, tough luck.
 - The tool will also contain features such as:
-    - Simple tool => simple interface (no buttons or unnecessary dialogs, edit everything in one window), the user only needs to know how to left-click, right-click and drag and drop.
+    - Simple tool => simple interface - no buttons or unnecessary dialogs, edit everything in one window.
     - Basic functionalities such as adding, deleting, editing a run (its name so far) - implemented.
     - Setting the added runs in a preferred position simply by dragging and dropping the run - implemented.
     - Dynamically updated runs (like the spacing between the runs and their width) - future implementation.
