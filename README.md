@@ -10,7 +10,7 @@ Currently being developed by one person - that's me :) - using C# WPF. Below you
     - Simple tool => simple interface - no buttons or unnecessary dialogs, edit everything in one window.
     - Basic functionalities such as adding, deleting, editing a run (its name so far) - implemented.
     - Setting the added runs in a preferred position simply by dragging and dropping the run - implemented.
-    - Dynamically updated runs (like the spacing between the runs and their width) - future implementation.
+    - Dynamically updated runs (this includes the possibility to modify the spacing between the runs, their width and height and other parameters) - implemented dynamic spacings whenever the user adds/removes a run.
     - Loading and saving templates with runs that are meant to be completed (so that the user does not create the runs everytime the program is booted) - future implementation.
     - Shortcuts for ease of use (go to next run, go to previous run) - future implementation.
     - Randomize the order of the runs - future implementation.
