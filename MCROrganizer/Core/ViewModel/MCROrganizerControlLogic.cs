@@ -27,7 +27,7 @@ namespace MCROrganizer.Core.ViewModel
         private Thickness _itemsControlMargins = new Thickness(20.0, 20.0, 20.0, 10.0);
         private Double _itemsControlWidth = 0.0;
         private Double _spacingBetweenRuns = 20.0;
-        private Dictionary<DraggableButton, Double> _abscissaByRun = null;
+        private Dictionary<DraggableButton, Double> _abscissaByRun = null; // Each abscissa entry will be relative to the ItemsControl (the parent of all DraggableButtons).
         private Dictionary<Int32, List<Double>> _abscissaByNumberOfRunsCases = null;
         private ObservableCollection<DraggableButton> _runs = null;
         private MainControl _userControl = null;
@@ -43,7 +43,6 @@ namespace MCROrganizer.Core.ViewModel
         public Double ItemsControlWidth => _itemsControlWidth;
         public ObservableCollection<DraggableButton> Runs => _runs;
         public Dictionary<DraggableButton, Double> AbscissaByRun => _abscissaByRun;
-        public LinkedList<(Double abscissa, Int32 vacantIndex)> AbscissasInQueue { get; set; }
         public MainControl MainControl => _userControl;
         #endregion
 
@@ -52,8 +51,7 @@ namespace MCROrganizer.Core.ViewModel
         {
             _userControl = userControl;
             InitializeDefaultRuns(ref _runs, ref _abscissaByRun);
-            AbscissasInQueue = new LinkedList<(Double abscissa, Int32 vacantIndex)>();
-            ComputeAbscissaCases(_abscissaByNumberOfRunsCases);
+            ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
         }
         #endregion
 
@@ -118,44 +116,55 @@ namespace MCROrganizer.Core.ViewModel
             }
         }
 
-        private void AddRun(DraggableButton newRun = null)
+        private void AddRun()
         {
-            if (newRun == null)
-                newRun = new DraggableButton(this);
+            // Check if the new number of runs is okay.
+            if (!_abscissaByNumberOfRunsCases.ContainsKey(_runs.Count + 1))
+                return;
 
-            Double newRunAbscissaValue = 0.0;
-            Point relativeLocation = newRun.TranslatePoint(new Point(0, 0), VisualTreeHelper.GetParent(newRun) as Canvas);
-
-            if (AbscissasInQueue.Count > 0)
-            {
-                var queuedAbscissa = AbscissasInQueue.First();
-                _runs.Insert(queuedAbscissa.vacantIndex, newRun);
-                newRunAbscissaValue = queuedAbscissa.abscissa;
-                AbscissasInQueue.RemoveFirst();
-            }
-            else
-            {
-                _runs.Add(newRun);
-                newRunAbscissaValue = relativeLocation.X + (newRun.DBDataContext.Width + _spacingBetweenRuns) * (_runs.Count - 1);
-            }
-
-            // Translate the item accordingly and shift the pivot point to the middle of the button.
-            TranslateItemHorizontally(newRun, newRunAbscissaValue);
-            _abscissaByRun.Add(newRun, newRunAbscissaValue);
+            // After adding a run we need to update the abscissas and the data structures.
+            _runs.Add(new DraggableButton(this));
+            UpdateAbscissasAndContainers();
         }
 
         public void RemoveRun(DraggableButton deletedRun)
         {
-            // Place the deleted position and its index in the linked list and sort it.
-            AbscissasInQueue.AddLast((AbscissaByRun[deletedRun], _runs.IndexOf(deletedRun)));
-            AbscissasInQueue = new LinkedList<(Double abscissa, Int32 vacantIndex)>(AbscissasInQueue.OrderBy(x => x.abscissa));
+            // Check if the new number of runs is okay.
+            if (!_abscissaByNumberOfRunsCases.ContainsKey(_runs.Count - 1))
+                return;
 
-            // Secondly, Remove the objects from the data structures.
+            // After removing a run we need to update the abscissas and the data structures.
             _runs.Remove(deletedRun);
-            AbscissaByRun.Remove(deletedRun);
+            _abscissaByRun.Remove(deletedRun);
+            UpdateAbscissasAndContainers();
         }
 
-        private void InitializeDefaultRuns(ref ObservableCollection<DraggableButton> runs, ref Dictionary<DraggableButton, double> abscissaByRun)
+        /// <summary>
+        /// This method searches for the current number of runs, if this number is registered in the dictionary, then it will retrieve
+        /// the list of abscissas the new runs are supposed to contain and it will update each abscissa.
+        /// </summary>
+        public void UpdateAbscissasAndContainers()
+        {
+            if (_abscissaByNumberOfRunsCases.TryGetValue(_runs.Count, out var abscissas))
+            {
+                for (Int32 iRun = 0; iRun < _runs.Count; ++iRun)
+                {
+                    Double currentAbscissa = abscissas[iRun];
+                    DraggableButton currentRun = _runs[iRun];
+
+                    // Translate the item accordingly using the new abscissa value.
+                    TranslateItemHorizontally(currentRun, currentAbscissa);
+
+                    // Modify the abscissa of the run with the new value.
+                    if (!_abscissaByRun.ContainsKey(currentRun))
+                        _abscissaByRun.Add(currentRun, currentAbscissa);
+                    else
+                        _abscissaByRun[currentRun] = currentAbscissa;
+                }
+            }
+        }
+
+        private void InitializeDefaultRuns(ref ObservableCollection<DraggableButton> runs, ref Dictionary<DraggableButton, Double> abscissaByRun)
         {
             runs = new ObservableCollection<DraggableButton>()
             {
@@ -171,36 +180,37 @@ namespace MCROrganizer.Core.ViewModel
 
             Double runWidth = runs.FirstOrDefault().DBDataContext.Width;
             Double nextPivotPoint = _spacingBetweenRuns + runWidth;
-            Double startAbscissa = _itemsControlWidth / 2.0 - _spacingBetweenRuns / 2.0 - runWidth;
 
-            // The AbscissaByRun dictionary represents the position of each button relative to the position of the left-most button.
-            // Because we are working with an ItemsControl that covers a wider area, then we'll have to place things a bit differently.
-            // x = 0 position will actually be relative to the start of the ItemsControl.
+            // Compute the start abscissa of the runs 
+            Double startAbscissa = (_itemsControlWidth - (runWidth * runs.Count + _spacingBetweenRuns * (runs.Count - 1))) / 2.0;
+
             foreach (var run in runs)
             {
-                abscissaByRun.Add(run, nextPivotPoint * abscissaByRun.Count);
+                abscissaByRun.Add(run, startAbscissa + nextPivotPoint * abscissaByRun.Count);
                 TranslateItemHorizontally(run, startAbscissa + nextPivotPoint * (abscissaByRun.Count - 1));
             }
         }
 
-        private void ComputeAbscissaCases(Dictionary<Int32, List<Double>> abscissaByNumberOfRunsCases)
+        private void ComputeAbscissaCases(ref Dictionary<Int32, List<Double>> abscissaByNumberOfRunsCases)
         {
             abscissaByNumberOfRunsCases = new Dictionary<Int32, List<Double>>();
-
             Double runWidth = _runs.FirstOrDefault().DBDataContext.Width;
-            Double nextPivotPoint = _spacingBetweenRuns + runWidth;
             Int32 maximumNumberOfRuns = (Int32)Math.Floor(_itemsControlWidth / (runWidth + _spacingBetweenRuns));
 
-            for (Int32 iRunCase = _runs.Count; iRunCase < maximumNumberOfRuns; ++iRunCase)
+            for (Int32 iRunCase = _runs.Count; iRunCase <= maximumNumberOfRuns; ++iRunCase)
             {
-                // Have a List of tuples here that holds the abscissas relative to the group as the first item and the abscissas relative to the ItemsControl as the second item.
-                List<Double> abscissas = new List<Double>();
+                Double startAbscissa = (_itemsControlWidth - (runWidth * iRunCase + _spacingBetweenRuns * (iRunCase - 1))) / 2.0;
+                var abscissas = new List<Double> { startAbscissa };
+
                 for (Int32 iRun = 0; iRun < iRunCase; ++iRun)
                 {
-                    abscissas.Add(nextPivotPoint * abscissas.Count);
-                }
+                    Double nextPivotPoint = (_spacingBetweenRuns + runWidth) * iRun;
 
-                abscissaByNumberOfRunsCases.Add(iRunCase, abscissas);
+                    if (!abscissaByNumberOfRunsCases.ContainsKey(iRunCase))
+                        abscissaByNumberOfRunsCases.Add(iRunCase, abscissas);
+                    else
+                        abscissas.Add(startAbscissa + nextPivotPoint);
+                }
             }
         }
         #endregion
