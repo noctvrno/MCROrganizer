@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using MCROrganizer.Core.Commands;
 using MCROrganizer.Core.CustomControls;
 using MCROrganizer.Core.Utils;
@@ -24,6 +25,7 @@ namespace MCROrganizer.Core.ViewModel
     {
         #region Data Members
         private Double _controlWidth = 400.0;
+        private Double _controlHeight = 800.0;
         private Thickness _itemsControlMargins = new Thickness(20.0, 20.0, 20.0, 10.0);
         private Double _itemsControlWidth = 0.0;
         private Double _spacingBetweenRuns = 20.0;
@@ -38,6 +40,12 @@ namespace MCROrganizer.Core.ViewModel
         {
             get => _controlWidth;
             set => _controlWidth = value;
+        }
+
+        public Double ControlHeight
+        {
+            get => _controlHeight;
+            set => _controlHeight = value;
         }
         public Thickness ItemsControlMargins => _itemsControlMargins;
         public Double ItemsControlWidth => _itemsControlWidth;
@@ -56,6 +64,8 @@ namespace MCROrganizer.Core.ViewModel
         #endregion
 
         #region Commands
+        private static ImageSource _addRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "AddRun.png"));
+        public ImageSource AddRunImage => _addRunImage;
         public ICommand AddRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => AddRun()));
         #endregion
 
@@ -164,6 +174,10 @@ namespace MCROrganizer.Core.ViewModel
             }
         }
 
+        /// <summary>
+        /// Initializes a default number of runs (two) and aligns them to the center of the screen.
+        /// This method should be called when the user creates a default template.
+        /// </summary>
         private void InitializeDefaultRuns(ref ObservableCollection<DraggableButton> runs, ref Dictionary<DraggableButton, Double> abscissaByRun)
         {
             runs = new ObservableCollection<DraggableButton>()
