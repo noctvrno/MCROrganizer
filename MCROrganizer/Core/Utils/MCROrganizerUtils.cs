@@ -12,8 +12,10 @@ namespace MCROrganizer.Core.Utils
         private static String _baseDirectoryPath = Environment.CurrentDirectory;
         private static String _projectPath = Directory.GetParent(_baseDirectoryPath).Parent.FullName;
         private static String _imagePath = Path.Combine(_projectPath, @"Tools\Images\");
+        private static String _extension = ".mcro";
         public static String BaseDirectoryPath => _baseDirectoryPath;
         public static String ProjectPath => _projectPath;
         public static String ImagePath => _imagePath;
+        public static String Extension => _extension;
     }
 }

@@ -47,6 +47,26 @@
                     <Image Source="{Binding AddRunImage}" />
                 </MenuItem.Icon>
             </MenuItem>
+            <Separator/>
+            <!-- Save Run command -->
+            <MenuItem Header="Save Run" Command="{Binding Path=PlacementTarget.DataContext.SaveRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Saves all the information about the current runs for reusability in the current template.">
+                <MenuItem.Icon>
+                    <Image Source="{Binding SaveRunImage}" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <!-- Save Run As command -->
+            <MenuItem Header="Save Run As" Command="{Binding Path=PlacementTarget.DataContext.SaveRunAsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Saves all the information about the current runs for reusability in a new template.">
+                <MenuItem.Icon>
+                    <Image Source="{Binding SaveRunAsImage}" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <Separator/>
+            <!-- Load Run -->
+            <MenuItem Header="Load Run" Command="{Binding Path=PlacementTarget.DataContext.LoadRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Loads an already existing run template.">
+                <MenuItem.Icon>
+                    <Image Source="{Binding LoadRunImage}" />
+                </MenuItem.Icon>
+            </MenuItem>
         </ContextMenu>
     </UserControl.ContextMenu>
 </UserControl>
