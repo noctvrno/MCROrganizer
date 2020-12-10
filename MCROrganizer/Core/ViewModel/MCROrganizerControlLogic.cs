@@ -11,6 +11,8 @@ using MCROrganizer.Core.Commands;
 using MCROrganizer.Core.CustomControls;
 using MCROrganizer.Core.Utils;
 using MCROrganizer.Core.View;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace MCROrganizer.Core.ViewModel
 {
@@ -23,50 +25,89 @@ namespace MCROrganizer.Core.ViewModel
 
     public class ControlLogic : UserControlDataContext
     {
-        #region Data Members
-        private Double _controlWidth = 400.0;
-        private Double _controlHeight = 800.0;
-        private Thickness _itemsControlMargins = new Thickness(20.0, 20.0, 20.0, 10.0);
-        private Double _itemsControlWidth = 0.0;
-        private Double _spacingBetweenRuns = 20.0;
-        private Dictionary<DraggableButton, Double> _abscissaByRun = null; // Each abscissa entry will be relative to the ItemsControl (the parent of all DraggableButtons).
-        private Dictionary<Int32, List<Double>> _abscissaByNumberOfRunsCases = null;
-        private ObservableCollection<DraggableButton> _runs = null;
-        private MainControl _userControl = null;
-        #endregion
+        #region Customization properties
+        private Int32 _minimumNumberOfRuns = 2;
 
-        #region Accessors
+        // Width of the main control.
+        private Double _controlWidth = 400.0;
         public Double ControlWidth
         {
             get => _controlWidth;
             set => _controlWidth = value;
         }
 
+        // Height of the main control.
+        private Double _controlHeight = 800.0;
         public Double ControlHeight
         {
             get => _controlHeight;
             set => _controlHeight = value;
         }
+
+        // Margins for the ItemsControl
+        private Thickness _itemsControlMargins = new Thickness(20.0, 20.0, 20.0, 10.0);
         public Thickness ItemsControlMargins => _itemsControlMargins;
+
+        // Width of the ItemsControl
+        private Double _itemsControlWidth = 0.0;
         public Double ItemsControlWidth => _itemsControlWidth;
-        public ObservableCollection<DraggableButton> Runs => _runs;
+
+        // Spacing
+        private Double _spacingBetweenRuns = 20.0;
+        #endregion
+
+        #region Two-Way Helper DataBinding Properties
+        // ItemsSource for the ItemsControl
+        private ObservableCollection<DraggableButton> _runs = null;
+        public ObservableCollection<DraggableButton> Runs
+        {
+            get => _runs;
+            set => _runs = value;
+        }
+
+        // Main Hash Table that stores each run and their current abscissa.
+        private Dictionary<DraggableButton, Double> _abscissaByRun = null; // Each abscissa entry will be relative to the ItemsControl (the parent of all DraggableButtons).
         public Dictionary<DraggableButton, Double> AbscissaByRun => _abscissaByRun;
+
+        // Secondary Hash Table that stores each possible run number scenario next to their respective collection of abscissas.
+        private Dictionary<Int32, List<Double>> _abscissaByNumberOfRunsCases = null;
+
+        // Add Run Command.
+        private static ImageSource _addRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "AddRun.png"));
+        public ImageSource AddRunImage => _addRunImage;
+        public ICommand AddRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => AddRun()));
+
+        // Save Run Template Command.
+        private static ImageSource _saveRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SaveRun.png"));
+        public ImageSource SaveRunImage => _saveRunImage;
+        public ICommand SaveRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _runTemplateManager.SaveAs()));
+
+        // Save Run As Template Command.
+        private static ImageSource _saveRunAsImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SaveRunAs.png"));
+        public ImageSource SaveRunAsImage => _saveRunAsImage;
+        public ICommand SaveRunAsCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _runTemplateManager.SaveAs()));
+
+        // Save Run As Template Command.
+        private static ImageSource _loadRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "LoadRun.png"));
+        public ImageSource LoadRunImage => _loadRunImage;
+        public ICommand LoadRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => LoadRunTemplate()));
+
+        // View object.
+        private MainControl _userControl = null;
         public MainControl MainControl => _userControl;
+
+        // Template manager.
+        private RunTemplateManager _runTemplateManager = null;
         #endregion
 
         #region Initialization
         public ControlLogic(MainControl userControl)
         {
             _userControl = userControl;
+            _runTemplateManager = new RunTemplateManager(this);
             InitializeDefaultRuns(ref _runs, ref _abscissaByRun);
             ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
         }
-        #endregion
-
-        #region Commands
-        private static ImageSource _addRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "AddRun.png"));
-        public ImageSource AddRunImage => _addRunImage;
-        public ICommand AddRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => AddRun()));
         #endregion
 
         #region Functionality
@@ -178,13 +219,16 @@ namespace MCROrganizer.Core.ViewModel
         /// Initializes a default number of runs (two) and aligns them to the center of the screen.
         /// This method should be called when the user creates a default template.
         /// </summary>
-        private void InitializeDefaultRuns(ref ObservableCollection<DraggableButton> runs, ref Dictionary<DraggableButton, Double> abscissaByRun)
+        private void InitializeDefaultRuns(ref ObservableCollection<DraggableButton> runs, ref Dictionary<DraggableButton, Double> abscissaByRun, Boolean isDefaultTemplate = true)
         {
-            runs = new ObservableCollection<DraggableButton>()
+            if (isDefaultTemplate)
             {
-                new DraggableButton(this),
-                new DraggableButton(this)
-            };
+                runs = new ObservableCollection<DraggableButton>()
+                {
+                    new DraggableButton(this),
+                    new DraggableButton(this)
+                };
+            }
 
             abscissaByRun = new Dictionary<DraggableButton, Double>();
 
@@ -211,7 +255,7 @@ namespace MCROrganizer.Core.ViewModel
             Double runWidth = _runs.FirstOrDefault().DBDataContext.Width;
             Int32 maximumNumberOfRuns = (Int32)Math.Floor(_itemsControlWidth / (runWidth + _spacingBetweenRuns));
 
-            for (Int32 iRunCase = _runs.Count; iRunCase <= maximumNumberOfRuns; ++iRunCase)
+            for (Int32 iRunCase = _minimumNumberOfRuns; iRunCase <= maximumNumberOfRuns; ++iRunCase)
             {
                 Double startAbscissa = (_itemsControlWidth - (runWidth * iRunCase + _spacingBetweenRuns * (iRunCase - 1))) / 2.0;
                 var abscissas = new List<Double> { startAbscissa };
@@ -226,6 +270,20 @@ namespace MCROrganizer.Core.ViewModel
                         abscissas.Add(startAbscissa + nextPivotPoint);
                 }
             }
+        }
+
+        private void LoadRunTemplate()
+        {
+            _runs.Clear();
+            ObservableCollection<DraggableButtonDataContext> deserializedRunsData = _runTemplateManager.LoadData();
+
+            foreach (var runData in deserializedRunsData)
+            {
+                _runs.Add(new DraggableButton(this, runData));
+            }
+
+            InitializeDefaultRuns(ref _runs, ref _abscissaByRun, false);
+            ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
         }
         #endregion
     }

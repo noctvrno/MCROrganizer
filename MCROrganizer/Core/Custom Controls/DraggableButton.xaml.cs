@@ -2,21 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using MCROrganizer.Core.ViewModel;
 using MCROrganizer.Core.View;
 using MCROrganizer.Core.Extensions;
 using MCROrganizer.Core.Utils;
+using Newtonsoft.Json;
 
 namespace MCROrganizer.Core.CustomControls
 {
@@ -77,6 +72,8 @@ namespace MCROrganizer.Core.CustomControls
         #region Two-Way Helper DataBinding Properties
         // Controls whether the button can be interacted with or not.
         private Boolean _isHitTestVisible = false;
+
+        [JsonIgnore]
         public Boolean IsHitTestVisible
         {
             get => _isHitTestVisible;
@@ -89,6 +86,8 @@ namespace MCROrganizer.Core.CustomControls
 
         // Changes the focus to the button and highlights the text within it.
         private Boolean _isFocused = false;
+
+        [JsonIgnore]
         public Boolean IsFocused
         {
             get => _isFocused;
@@ -102,21 +101,28 @@ namespace MCROrganizer.Core.CustomControls
         // Delete run command.
         private static ImageSource _deleteRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "DeleteRun.png"));
         public ImageSource DeleteRunImage => _deleteRunImage;
-        public ICommand DeleteRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.RemoveRun(_control)));
+        public MCROCommand DeleteRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.RemoveRun(_control)));
 
         // Rename run command.
         private static ImageSource _renameRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "RenameRun.png"));
         public ImageSource RenameRunImage => _renameRunImage;
-        public ICommand RenameRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => MakeButtonEditable()));
+        public MCROCommand RenameRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => MakeButtonEditable()));
 
         // Set run as current command.
         private static ImageSource _setCurrentRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SetCurrentRun.png"));
         public ImageSource SetCurrentRunImage => _setCurrentRunImage;
-        public ICommand SetCurrentRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.SetRunAsCurrent(_control)));
+        public MCROCommand SetCurrentRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.SetRunAsCurrent(_control)));
         #endregion
 
         #region Communication fields
         private DraggableButton _control = null;
+
+        [JsonIgnore]
+        public DraggableButton Control
+        {
+            get => _control;
+            set => _control = value;
+        }
         #endregion
 
         #region Helper methods
@@ -125,8 +131,6 @@ namespace MCROrganizer.Core.CustomControls
             IsHitTestVisible = IsFocused = isEditable;
         }
         #endregion
-
-        public DraggableButtonDataContext(DraggableButton control) => _control = control;
     }
 
     public partial class DraggableButton : UserControl
@@ -144,9 +148,11 @@ namespace MCROrganizer.Core.CustomControls
         #endregion
 
         #region Initialization
-        public DraggableButton(ControlLogic parent)
+        public DraggableButton(ControlLogic parent, DraggableButtonDataContext data = null)
         {
-            DataContext = _dataContext = new DraggableButtonDataContext(this);
+            // data will be null for every instantiation of a run, except for a load because in that case, we dserialize the data from a json file.
+            DataContext = _dataContext = data ?? new DraggableButtonDataContext();
+            _dataContext.Control = this;
             InitializeComponent();
             _isDragging = false;
             _parent = parent;
