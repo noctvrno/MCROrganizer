@@ -44,8 +44,6 @@ namespace MCROrganizer.Core.Utils
 
         public ObservableCollection<DraggableButtonDataContext> LoadData(Boolean loadPreviousSessionTemplate = false)
         {
-            _managedControl.Runs.Clear();
-
             OpenFileDialog fileBrowserDialog = new OpenFileDialog()
             {
                 InitialDirectory = PathUtils.ImagePath,
@@ -56,6 +54,8 @@ namespace MCROrganizer.Core.Utils
 
             if (fileBrowserDialog.ShowDialog() != DialogResult.OK)
                 return new ObservableCollection<DraggableButtonDataContext>();
+
+            _managedControl.Runs.Clear();
 
             // Read the jsonString from the loaded file.
             String jsonString = File.ReadAllText(fileBrowserDialog.FileName);

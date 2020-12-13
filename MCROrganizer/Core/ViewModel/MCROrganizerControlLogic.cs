@@ -274,7 +274,6 @@ namespace MCROrganizer.Core.ViewModel
 
         private void LoadRunTemplate()
         {
-            _runs.Clear();
             ObservableCollection<DraggableButtonDataContext> deserializedRunsData = _runTemplateManager.LoadData();
 
             foreach (var runData in deserializedRunsData)
