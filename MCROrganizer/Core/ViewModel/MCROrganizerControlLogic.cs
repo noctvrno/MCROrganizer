@@ -80,7 +80,7 @@ namespace MCROrganizer.Core.ViewModel
         // Save Run Template Command.
         private static ImageSource _saveRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SaveRun.png"));
         public ImageSource SaveRunImage => _saveRunImage;
-        public ICommand SaveRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _runTemplateManager.SaveAs()));
+        public ICommand SaveRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _runTemplateManager.Save()));
 
         // Save Run As Template Command.
         private static ImageSource _saveRunAsImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SaveRunAs.png"));

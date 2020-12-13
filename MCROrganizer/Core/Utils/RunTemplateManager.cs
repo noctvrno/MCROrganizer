@@ -15,10 +15,36 @@ namespace MCROrganizer.Core.Utils
     {
         private ControlLogic _managedControl = null;
         private static String filterString = "MCRO Files (*" + PathUtils.Extension + ")|";
+        private String currentTemplatePath = String.Empty;
 
         public RunTemplateManager(ControlLogic managedControl)
         {
             _managedControl = managedControl;
+        }
+
+        public void Save()
+        {
+            if (currentTemplatePath == String.Empty)
+            {
+                SaveAs();
+                return;
+            }
+
+            CreateAndWriteJSONStringToFile();
+        }
+
+        private void CreateAndWriteJSONStringToFile()
+        {
+            // Create a JSON string.
+            String jsonString = JsonConvert.SerializeObject
+            (
+                _managedControl.Runs.Select(x => x.DBDataContext),
+                Formatting.Indented,
+                new JsonConverter[] { new StringEnumConverter() }
+            );
+
+            // Write all of it into the current template path.
+            File.WriteAllText(currentTemplatePath, jsonString);
         }
 
         public void SaveAs()
@@ -34,12 +60,10 @@ namespace MCROrganizer.Core.Utils
             if (folderBrowserDialog.ShowDialog() != DialogResult.OK)
                 return;
 
-            String jsonString = JsonConvert.SerializeObject(
-                _managedControl.Runs.Select(x => x.DBDataContext),
-                Formatting.Indented,
-                new JsonConverter[] { new StringEnumConverter() });
+            // Update the path of the current template.
+            currentTemplatePath = Path.Combine(folderBrowserDialog.InitialDirectory, folderBrowserDialog.FileName);
 
-            File.WriteAllText(Path.Combine(folderBrowserDialog.InitialDirectory, folderBrowserDialog.FileName), jsonString);
+            CreateAndWriteJSONStringToFile();
         }
 
         public ObservableCollection<DraggableButtonDataContext> LoadData(Boolean loadPreviousSessionTemplate = false)
@@ -57,8 +81,11 @@ namespace MCROrganizer.Core.Utils
 
             _managedControl.Runs.Clear();
 
+            // Update the path of the current template.
+            currentTemplatePath = fileBrowserDialog.FileName;
+
             // Read the jsonString from the loaded file.
-            String jsonString = File.ReadAllText(fileBrowserDialog.FileName);
+            String jsonString = File.ReadAllText(currentTemplatePath);
 
             // Actual deserialization.
             var runsData = new ObservableCollection<DraggableButtonDataContext>
