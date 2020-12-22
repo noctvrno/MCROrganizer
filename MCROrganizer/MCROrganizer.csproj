@@ -148,23 +148,26 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Tools\Images\RenameRun.png" />
+    <Resource Include="Data\Images\RenameRun.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Tools\Images\SetCurrentRun.png" />
+    <Resource Include="Data\Images\SetCurrentRun.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Tools\Images\DeleteRun.png" />
+    <Resource Include="Data\Images\DeleteRun.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Tools\Images\AddRun.png" />
+    <Resource Include="Data\Images\AddRun.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Tools\Images\SaveRunAs.png" />
-    <Resource Include="Tools\Images\SaveRun.png" />
+    <Resource Include="Data\Images\SaveRunAs.png" />
+    <Resource Include="Data\Images\SaveRun.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Tools\Images\LoadRun.png" />
+    <Resource Include="Data\Images\LoadRun.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\General\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

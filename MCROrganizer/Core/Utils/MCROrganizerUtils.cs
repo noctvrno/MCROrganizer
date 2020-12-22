@@ -11,11 +11,16 @@ namespace MCROrganizer.Core.Utils
     {
         private static String _baseDirectoryPath = Environment.CurrentDirectory;
         private static String _projectPath = Directory.GetParent(_baseDirectoryPath).Parent.FullName;
-        private static String _imagePath = Path.Combine(_projectPath, @"Tools\Images\");
+        private static String _imagePath = Path.Combine(_projectPath, @"Data\Images\");
+        private static String _generalDataPath = Path.Combine(_projectPath, @"Data\General\");
         private static String _extension = ".mcro";
+        private static String _generalDataFilePath = _generalDataPath + "General" + _extension;
+
         public static String BaseDirectoryPath => _baseDirectoryPath;
         public static String ProjectPath => _projectPath;
         public static String ImagePath => _imagePath;
+        public static String GeneralDataPath => _generalDataPath;
         public static String Extension => _extension;
+        public static String GeneralDataFilePath => _generalDataFilePath;
     }
 }

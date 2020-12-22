@@ -14,37 +14,56 @@ namespace MCROrganizer.Core.Utils
     public class RunTemplateManager
     {
         private ControlLogic _managedControl = null;
-        private static String filterString = "MCRO Files (*" + PathUtils.Extension + ")|";
-        private String currentTemplatePath = String.Empty;
+        private static String _filterString = "MCRO Files (*" + PathUtils.Extension + ")|";
+        private static String _currentTemplatePath = String.Empty;
+
+        public static String CurrentTemplatePath => _currentTemplatePath;
 
         public RunTemplateManager(ControlLogic managedControl)
         {
             _managedControl = managedControl;
+            _currentTemplatePath = ReadCurrentTemplatePath();
+        }
+
+        private String ReadCurrentTemplatePath()
+        {
+            // Read the jsonString from the general data file.
+            String jsonString = String.Empty;
+            try
+            {
+                jsonString = File.ReadAllText(PathUtils.GeneralDataFilePath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("General.mcro file is corrupt. The default template will be loaded.\nDEV NOTE:\n" + e, "Corrupt Data", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return String.Empty;
+            }
+            return JsonConvert.DeserializeObject<String>(jsonString);
         }
 
         public void Save()
         {
-            if (currentTemplatePath == String.Empty)
+            if (_currentTemplatePath == String.Empty)
             {
                 SaveAs();
                 return;
             }
 
-            CreateAndWriteJSONStringToFile();
+            WriteToJSON(_managedControl.Runs.Select(x => x.DBDataContext));
         }
 
-        private void CreateAndWriteJSONStringToFile()
+        public static void WriteToJSON(Object serializedData, String filePath = null)
         {
             // Create a JSON string.
             String jsonString = JsonConvert.SerializeObject
             (
-                _managedControl.Runs.Select(x => x.DBDataContext),
+                serializedData,
                 Formatting.Indented,
                 new JsonConverter[] { new StringEnumConverter() }
             );
 
             // Write all of it into the current template path.
-            File.WriteAllText(currentTemplatePath, jsonString);
+            File.WriteAllText(filePath ?? _currentTemplatePath, jsonString);
         }
 
         public void SaveAs()
@@ -52,7 +71,7 @@ namespace MCROrganizer.Core.Utils
             SaveFileDialog folderBrowserDialog = new SaveFileDialog()
             {
                 RestoreDirectory = false,
-                Filter = filterString,
+                Filter = _filterString,
                 DefaultExt = PathUtils.Extension,
                 AddExtension = true,
             };
@@ -61,36 +80,54 @@ namespace MCROrganizer.Core.Utils
                 return;
 
             // Update the path of the current template.
-            currentTemplatePath = Path.Combine(folderBrowserDialog.InitialDirectory, folderBrowserDialog.FileName);
+            _currentTemplatePath = Path.Combine(folderBrowserDialog.InitialDirectory, folderBrowserDialog.FileName);
 
-            CreateAndWriteJSONStringToFile();
+            WriteToJSON(_managedControl.Runs.Select(x => x.DBDataContext));
         }
 
-        public ObservableCollection<DraggableButtonDataContext> LoadData(Boolean loadPreviousSessionTemplate = false)
+        public Collection<T> LoadData<T, U>(ICollection<U> entitiesToClearOnLoad, Boolean browseForFile = true)
+            where T : UserControlDataContext
+            where U : System.Windows.Controls.UserControl
         {
-            OpenFileDialog fileBrowserDialog = new OpenFileDialog()
+
+            OpenFileDialog fileBrowserDialog = null;
+            if (browseForFile)
             {
-                InitialDirectory = PathUtils.ImagePath,
-                Filter = filterString,
-                DefaultExt = PathUtils.Extension,
-                AddExtension = true
-            };
+                fileBrowserDialog = new OpenFileDialog()
+                {
+                    InitialDirectory = PathUtils.ImagePath,
+                    Filter = _filterString,
+                    DefaultExt = PathUtils.Extension,
+                    AddExtension = true
+                };
 
-            if (fileBrowserDialog.ShowDialog() != DialogResult.OK)
-                return new ObservableCollection<DraggableButtonDataContext>();
+                if (fileBrowserDialog.ShowDialog() != DialogResult.OK)
+                    return new Collection<T>();
+            }
 
-            _managedControl.Runs.Clear();
+            entitiesToClearOnLoad.Clear();
 
             // Update the path of the current template.
-            currentTemplatePath = fileBrowserDialog.FileName;
+            if (fileBrowserDialog?.FileName != null)
+                _currentTemplatePath = fileBrowserDialog.FileName;
 
             // Read the jsonString from the loaded file.
-            String jsonString = File.ReadAllText(currentTemplatePath);
+            String jsonString = String.Empty;
+            try
+            {
+                jsonString = File.ReadAllText(_currentTemplatePath);
+
+            }
+            catch (FileNotFoundException fnfe)
+            {
+                MessageBox.Show("The default template will be loaded.\nDEV NOTE:\n" + fnfe, "Corrupt Data", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return new Collection<T>();
+            }
 
             // Actual deserialization.
-            var runsData = new ObservableCollection<DraggableButtonDataContext>
+            var runsData = new ObservableCollection<T>
             (
-                JsonConvert.DeserializeObject<ObservableCollection<DraggableButtonDataContext>>
+                JsonConvert.DeserializeObject<ObservableCollection<T>>
                 (
                     jsonString,
                     new JsonConverter[] { new StringEnumConverter() }

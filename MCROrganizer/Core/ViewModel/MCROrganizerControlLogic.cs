@@ -87,7 +87,7 @@ namespace MCROrganizer.Core.ViewModel
         public ImageSource SaveRunAsImage => _saveRunAsImage;
         public ICommand SaveRunAsCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _runTemplateManager.SaveAs()));
 
-        // Save Run As Template Command.
+        // Load Run Template Command.
         private static ImageSource _loadRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "LoadRun.png"));
         public ImageSource LoadRunImage => _loadRunImage;
         public ICommand LoadRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => LoadRunTemplate()));
@@ -105,8 +105,14 @@ namespace MCROrganizer.Core.ViewModel
         {
             _userControl = userControl;
             _runTemplateManager = new RunTemplateManager(this);
-            InitializeDefaultRuns(ref _runs, ref _abscissaByRun);
-            ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
+            _runs = new ObservableCollection<DraggableButton>();
+            if (RunTemplateManager.CurrentTemplatePath != String.Empty)
+                LoadRunTemplate(false);
+            else
+            {
+                InitializeRuns(ref _runs, ref _abscissaByRun);
+                ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
+            }
         }
         #endregion
 
@@ -219,7 +225,7 @@ namespace MCROrganizer.Core.ViewModel
         /// Initializes a default number of runs (two) and aligns them to the center of the screen.
         /// This method should be called when the user creates a default template.
         /// </summary>
-        private void InitializeDefaultRuns(ref ObservableCollection<DraggableButton> runs, ref Dictionary<DraggableButton, Double> abscissaByRun, Boolean isDefaultTemplate = true)
+        private void InitializeRuns(ref ObservableCollection<DraggableButton> runs, ref Dictionary<DraggableButton, Double> abscissaByRun, Boolean isDefaultTemplate = true)
         {
             if (isDefaultTemplate)
             {
@@ -272,16 +278,16 @@ namespace MCROrganizer.Core.ViewModel
             }
         }
 
-        private void LoadRunTemplate()
+        private void LoadRunTemplate(Boolean browseForFile = true)
         {
-            ObservableCollection<DraggableButtonDataContext> deserializedRunsData = _runTemplateManager.LoadData();
+            var deserializedRunsData = new ObservableCollection<DraggableButtonDataContext>(_runTemplateManager.LoadData<DraggableButtonDataContext, DraggableButton>(_runs, browseForFile));
 
             foreach (var runData in deserializedRunsData)
             {
                 _runs.Add(new DraggableButton(this, runData));
             }
 
-            InitializeDefaultRuns(ref _runs, ref _abscissaByRun, false);
+            InitializeRuns(ref _runs, ref _abscissaByRun, _runs?.Count == 0);
             ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
         }
         #endregion
