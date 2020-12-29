@@ -5,39 +5,39 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MCROrganizer.Core.View"
              xmlns:viewModel ="clr-namespace:MCROrganizer.Core.ViewModel"
+             xmlns:utils ="clr-namespace:MCROrganizer.Core.Utils"
              mc:Ignorable="d" 
              Width="{Binding ControlWidth}"
              Height="{Binding ControlHeight}"
              Background="Gray">
+    <UserControl.Resources>
+        <utils:BooleanToDoubleConverter x:Key="b2d" />
+    </UserControl.Resources>
     <!-- Bind the control's DataContext to the class that will govern all the logic. -->
     <!--<UserControl.DataContext>
         <viewModel:ControlLogic x:Name="controlLogic"/>
     </UserControl.DataContext>-->
     <Canvas Width="{Binding ControlWidth}" Height="{Binding ControlHeight}">
-        <Grid Width="{Binding ItemsControlWidth}" Margin="{Binding ItemsControlMargins}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <Grid Margin="0 20 0 0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="50" />
+                <RowDefinition Height="{Binding IsCurrentRunLogoSet, Converter={StaticResource b2d}, ConverterParameter=25}" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Canvas Grid.Row="0" Grid.Column="0" Background="Turquoise" />
-            <Canvas Grid.Row="0" Grid.Column="1" Background="Blue" />
+            <Image Grid.Row="0" Source="{Binding RunInProgress.RunLogo}" HorizontalAlignment="Center" Width="{Binding ControlWidth}" Height="25" />
+            <ItemsControl x:Name="buttonsItemsControl" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="Auto" Margin="{Binding ItemsControlMargins}" ItemsSource="{Binding Runs}">
+                <ItemsControl.Style>
+                    <Style TargetType="{x:Type ItemsControl}">
+                        <Setter Property="ItemsPanel">
+                            <Setter.Value>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ItemsControl.Style>
+            </ItemsControl>
         </Grid>
-        <ItemsControl x:Name="buttonsItemsControl" ItemsSource="{Binding Runs}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{Binding ItemsControlMargins}" Width="Auto" >
-            <ItemsControl.Style>
-                <Style TargetType="{x:Type ItemsControl}">
-                    <Setter Property="ItemsPanel">
-                        <Setter.Value>
-                            <ItemsPanelTemplate>
-                                <Canvas />
-                            </ItemsPanelTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </ItemsControl.Style>
-        </ItemsControl>
     </Canvas>
     <UserControl.ContextMenu>
         <ContextMenu>

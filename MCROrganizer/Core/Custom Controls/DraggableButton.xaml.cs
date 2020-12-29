@@ -100,18 +100,31 @@ namespace MCROrganizer.Core.CustomControls
 
         // Delete run command.
         private static ImageSource _deleteRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "DeleteRun.png"));
-        public ImageSource DeleteRunImage => _deleteRunImage;
+        public static ImageSource DeleteRunImage => _deleteRunImage;
         public MCROCommand DeleteRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.RemoveRun(_control)));
 
         // Rename run command.
         private static ImageSource _renameRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "RenameRun.png"));
-        public ImageSource RenameRunImage => _renameRunImage;
+        public static ImageSource RenameRunImage => _renameRunImage;
         public MCROCommand RenameRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => MakeButtonEditable()));
 
         // Set run as current command.
         private static ImageSource _setCurrentRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SetCurrentRun.png"));
-        public ImageSource SetCurrentRunImage => _setCurrentRunImage;
+        public static ImageSource SetCurrentRunImage => _setCurrentRunImage;
         public MCROCommand SetCurrentRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.SetRunAsCurrent(_control)));
+
+        // Set run logo command.
+        private static ImageSource _setRunLogoImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SetRunLogo.png"));
+        public static ImageSource SetRunLogoImage => _setRunLogoImage;
+        public MCROCommand SetRunLogoCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => SetRunLogo()));
+
+        // Run logo.
+        private ImageSource _runLogo = null;
+        public ImageSource RunLogo
+        {
+            get => _runLogo;
+            set => _runLogo = value;
+        }
         #endregion
 
         #region Communication fields
@@ -129,6 +142,23 @@ namespace MCROrganizer.Core.CustomControls
         public void MakeButtonEditable(Boolean isEditable = true)
         {
             IsHitTestVisible = IsFocused = isEditable;
+        }
+
+        private void SetRunLogo()
+        {
+            var fileBrowserDialog = new System.Windows.Forms.OpenFileDialog();
+
+            if (fileBrowserDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                return;
+
+            try
+            {
+                _runLogo = new BitmapImage(new Uri(fileBrowserDialog.FileName));
+            }
+            catch
+            {
+                MessageBox.Show("Could not load the image file. Please try again with a different image.", "MCROrganizer", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
         #endregion
     }

@@ -15,6 +15,7 @@ namespace MCROrganizer.Core.Utils
         private static String _generalDataPath = Path.Combine(_projectPath, @"Data\General\");
         private static String _extension = ".mcro";
         private static String _generalDataFilePath = _generalDataPath + "General" + _extension;
+        private static String _MCROFilterString = "MCRO Files (*" + _extension + ")|";
 
         public static String BaseDirectoryPath => _baseDirectoryPath;
         public static String ProjectPath => _projectPath;
@@ -22,5 +23,6 @@ namespace MCROrganizer.Core.Utils
         public static String GeneralDataPath => _generalDataPath;
         public static String Extension => _extension;
         public static String GeneralDataFilePath => _generalDataFilePath;
+        public static String MCROFilterString => _MCROFilterString;
     }
 }

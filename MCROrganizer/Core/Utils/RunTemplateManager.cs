@@ -14,7 +14,6 @@ namespace MCROrganizer.Core.Utils
     public class RunTemplateManager
     {
         private ControlLogic _managedControl = null;
-        private static String _filterString = "MCRO Files (*" + PathUtils.Extension + ")|";
         private static String _currentTemplatePath = String.Empty;
 
         public static String CurrentTemplatePath => _currentTemplatePath;
@@ -71,7 +70,7 @@ namespace MCROrganizer.Core.Utils
             SaveFileDialog folderBrowserDialog = new SaveFileDialog()
             {
                 RestoreDirectory = false,
-                Filter = _filterString,
+                Filter = PathUtils.MCROFilterString,
                 DefaultExt = PathUtils.Extension,
                 AddExtension = true,
             };
@@ -96,7 +95,7 @@ namespace MCROrganizer.Core.Utils
                 fileBrowserDialog = new OpenFileDialog()
                 {
                     InitialDirectory = PathUtils.ImagePath,
-                    Filter = _filterString,
+                    Filter = PathUtils.MCROFilterString,
                     DefaultExt = PathUtils.Extension,
                     AddExtension = true
                 };
@@ -116,7 +115,6 @@ namespace MCROrganizer.Core.Utils
             try
             {
                 jsonString = File.ReadAllText(_currentTemplatePath);
-
             }
             catch (FileNotFoundException fnfe)
             {

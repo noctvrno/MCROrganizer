@@ -108,6 +108,7 @@
     </Compile>
     <Compile Include="Core\Extensions\DoubleExtensions.cs" />
     <Compile Include="Core\Utils\AttachedProperties.cs" />
+    <Compile Include="Core\Utils\Converters.cs" />
     <Compile Include="Core\Utils\MCROrganizerUtils.cs" />
     <Compile Include="Core\Utils\RunTemplateManager.cs" />
     <Compile Include="Core\Utils\UserControlDataContext.cs" />
@@ -168,6 +169,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\General\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Data\Images\SetRunLogo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
