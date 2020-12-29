@@ -55,6 +55,13 @@
                             <Image Source="{Binding SetCurrentRunImage}" />
                         </MenuItem.Icon>
                     </MenuItem>
+                    <Separator/>
+                    <!-- Set Run Logo command -->
+                    <MenuItem Header="Set Run Logo" Command="{Binding Path=PlacementTarget.DataContext.SetRunLogoCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Import an image file that will appear on top of the organizer when this run is set as active.">
+                        <MenuItem.Icon>
+                            <Image Source="{Binding SetRunLogoImage}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </ContextMenu>
             </Button.ContextMenu>
         </Button>

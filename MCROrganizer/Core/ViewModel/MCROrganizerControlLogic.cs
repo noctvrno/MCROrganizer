@@ -45,7 +45,7 @@ namespace MCROrganizer.Core.ViewModel
         }
 
         // Margins for the ItemsControl
-        private Thickness _itemsControlMargins = new Thickness(20.0, 20.0, 20.0, 10.0);
+        private Thickness _itemsControlMargins = new Thickness(20.0, 10.0, 20.0, 10.0);
         public Thickness ItemsControlMargins => _itemsControlMargins;
 
         // Width of the ItemsControl
@@ -54,6 +54,9 @@ namespace MCROrganizer.Core.ViewModel
 
         // Spacing
         private Double _spacingBetweenRuns = 20.0;
+
+        // Template manager.
+        private RunTemplateManager _runTemplateManager = null;
         #endregion
 
         #region Two-Way Helper DataBinding Properties
@@ -96,8 +99,20 @@ namespace MCROrganizer.Core.ViewModel
         private MainControl _userControl = null;
         public MainControl MainControl => _userControl;
 
-        // Template manager.
-        private RunTemplateManager _runTemplateManager = null;
+        // Current run.
+        private DraggableButtonDataContext _runInProgress = null;
+        public DraggableButtonDataContext RunInProgress
+        {
+            get => _runInProgress;
+            set
+            {
+                _runInProgress = value;
+                NotifyPropertyChanged("RunInProgress");
+                NotifyPropertyChanged("IsCurrentRunLogoSet");
+            }
+        }
+
+        public Boolean IsCurrentRunLogoSet => _runInProgress?.RunLogo != null;
         #endregion
 
         #region Initialization
@@ -146,6 +161,7 @@ namespace MCROrganizer.Core.ViewModel
 
         public void SetRunAsCurrent(DraggableButton selectedRun)
         {
+            RunInProgress = selectedRun.DBDataContext;
             Int32 selectedRunIndex = _runs.IndexOf(selectedRun);
             selectedRun.DBDataContext.RunState = RunState.InProgress;
 
@@ -234,7 +250,11 @@ namespace MCROrganizer.Core.ViewModel
                     new DraggableButton(this),
                     new DraggableButton(this)
                 };
+
+                SetRunAsCurrent(runs.FirstOrDefault());
             }
+            else
+                RunInProgress = _runs?.FirstOrDefault(x => x.DBDataContext.RunState == RunState.InProgress)?.DBDataContext; // Update the active run when loading template.
 
             abscissaByRun = new Dictionary<DraggableButton, Double>();
 
