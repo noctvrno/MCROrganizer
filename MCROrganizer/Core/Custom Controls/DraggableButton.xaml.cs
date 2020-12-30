@@ -146,6 +146,7 @@ namespace MCROrganizer.Core.CustomControls
 
         private void SetRunLogo()
         {
+            // MUST use a filter here.
             var fileBrowserDialog = new System.Windows.Forms.OpenFileDialog();
 
             if (fileBrowserDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
@@ -158,7 +159,12 @@ namespace MCROrganizer.Core.CustomControls
             catch
             {
                 MessageBox.Show("Could not load the image file. Please try again with a different image.", "MCROrganizer", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
+
+            // Update the main view after uploading the run logo.
+            _control.DBParent.NotifyPropertyChanged("RunInProgress");
+            _control.DBParent.NotifyPropertyChanged("IsCurrentRunLogoSet");
         }
         #endregion
     }
