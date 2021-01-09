@@ -25,6 +25,12 @@ namespace MCROrganizer.Core.CustomControls
     // Whenever the DraggableButton is instantiated, we could always access its DataContext and get/set whatever bound property we would like.
     public class DraggableButtonDataContext : UserControlDataContext
     {
+        public DraggableButtonDataContext(Double specifiedWidthFromMainControl, Double specifiedHeightFromMainControl)
+        {
+            Width = specifiedWidthFromMainControl;
+            Height = specifiedHeightFromMainControl;
+        }
+
         #region Customization Properties
         // Run name.
         private String _name = "DS";
@@ -65,7 +71,16 @@ namespace MCROrganizer.Core.CustomControls
         }
 
         // Width and height (hardcoded for now, might be changed into a two-way databinding in the future).
-        public Double Width { get; set; } = 50.0;
+        private Double _width = 50.0;
+        public Double Width
+        {
+            get => _width;
+            set
+            {
+                _width = value;
+                NotifyPropertyChanged("Width");
+            }
+        }
         public Double Height { get; set; } = 50.0;
         #endregion
 
@@ -184,10 +199,10 @@ namespace MCROrganizer.Core.CustomControls
         #endregion
 
         #region Initialization
-        public DraggableButton(ControlLogic parent, DraggableButtonDataContext data = null)
+        public DraggableButton(ControlLogic parent, DraggableButtonDataContext data = null, Double specifiedWidth = 50.0, Double specifiedHeight = 50.0)
         {
             // data will be null for every instantiation of a run, except for a load because in that case, we dserialize the data from a json file.
-            DataContext = _dataContext = data ?? new DraggableButtonDataContext();
+            DataContext = _dataContext = data ?? new DraggableButtonDataContext(specifiedWidth, specifiedHeight);
             _dataContext.Control = this;
             InitializeComponent();
             _isDragging = false;

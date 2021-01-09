@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MCROrganizer.Core.CustomControls;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,6 +33,29 @@ namespace MCROrganizer.Core.Utils
                 Keyboard.Focus(textBox);
                 textBox.SelectAll();
             }
+        }
+    }
+    #endregion
+
+    #region MenuItem Properties
+    public class MenuItemProperties
+    {
+        public static DependencyProperty DimensionTextProperty = DependencyProperty.RegisterAttached("DimensionText", typeof(String), typeof(MenuItemProperties), new UIPropertyMetadata(String.Empty, OnDimensionTextChanged));
+
+        public static String GetDimensionText(DependencyObject dependencyObject)
+        {
+            return (String)dependencyObject.GetValue(DimensionTextProperty);
+        }
+
+        public static void SetDimensionText(DependencyObject dependencyObject, String value)
+        {
+            dependencyObject.SetValue(DimensionTextProperty, value);
+        }
+
+        public static void OnDimensionTextChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            if (dependencyObject is EditRunDimensionMenuItem editRunDimensionMenuItem)
+                editRunDimensionMenuItem.CustomMenuItemDataContext.DimensionText = dependencyPropertyChangedEventArgs.NewValue as String;
         }
     }
     #endregion

@@ -21,7 +21,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Setter Property="Width" Value="{Binding Width}" />
+            <Setter Property="Width" Value="{Binding Width, Mode=TwoWay}" />
             <Setter Property="Height" Value="{Binding Height}" />
             <Setter Property="FontWeight" Value="Bold" />
         </Style>

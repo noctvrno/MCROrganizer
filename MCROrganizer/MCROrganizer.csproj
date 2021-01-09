@@ -90,6 +90,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Core\Custom Controls\EditRunDimensionMenuItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Core\View\MCROrganizerControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -105,6 +109,9 @@
     <Compile Include="Core\Commands\MCROrganizerCommands.cs" />
     <Compile Include="Core\Custom Controls\DraggableButton.xaml.cs">
       <DependentUpon>DraggableButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Custom Controls\EditRunDimensionMenuItem.xaml.cs">
+      <DependentUpon>EditRunDimensionMenuItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Core\Extensions\DoubleExtensions.cs" />
     <Compile Include="Core\Utils\AttachedProperties.cs" />

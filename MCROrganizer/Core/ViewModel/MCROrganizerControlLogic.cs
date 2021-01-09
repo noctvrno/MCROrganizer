@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using MCROrganizer.Core.Commands;
 using MCROrganizer.Core.CustomControls;
+using MCROrganizer.Core.Extensions;
 using MCROrganizer.Core.Utils;
 using MCROrganizer.Core.View;
 using Newtonsoft.Json;
@@ -21,6 +22,13 @@ namespace MCROrganizer.Core.ViewModel
         Pending,
         InProgress,
         Finished
+    }
+
+    public enum RunParameter
+    {
+        Width,
+        Height,
+        Spacing
     }
 
     public class ControlLogic : UserControlDataContext
@@ -42,6 +50,31 @@ namespace MCROrganizer.Core.ViewModel
         {
             get => _controlHeight;
             set => _controlHeight = value;
+        }
+
+        // Specified width for each added run. This setting is controlled using a cotenxtual menu in the main control.
+        public Double _specifiedRunWidth = 0.0;
+        public Double SpecifiedRunWidth
+        {
+            get => _specifiedRunWidth;
+            set
+            {
+                _specifiedRunWidth = value;
+                UpdateRuns(RunParameter.Width, value);
+                NotifyPropertyChanged("SpecifiedRunWidth");
+            }
+        }
+
+        // Maximum width that one run can have. This is something constant for all runs.
+        public Double _runWidthMax = Double.PositiveInfinity;
+        public Double RunWidthMax
+        {
+            get => _runWidthMax;
+            set
+            {
+                _runWidthMax = value;
+                NotifyPropertyChanged("RunWidthMax");
+            }
         }
 
         // Margins for the ItemsControl
@@ -128,6 +161,8 @@ namespace MCROrganizer.Core.ViewModel
                 InitializeRuns(ref _runs, ref _abscissaByRun);
                 ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
             }
+
+            SpecifiedRunWidth = _runInProgress.Width;
         }
         #endregion
 
@@ -196,7 +231,7 @@ namespace MCROrganizer.Core.ViewModel
                 return;
 
             // After adding a run we need to update the abscissas and the data structures.
-            _runs.Add(new DraggableButton(this));
+            _runs.Add(new DraggableButton(this, specifiedWidth: _specifiedRunWidth));
             UpdateAbscissasAndContainers();
         }
 
@@ -262,23 +297,42 @@ namespace MCROrganizer.Core.ViewModel
             _itemsControlWidth = _controlWidth - _itemsControlMargins.Left - _itemsControlMargins.Right;
             NotifyPropertyChanged("ItemsControlWidth");
 
-            Double runWidth = runs.FirstOrDefault().DBDataContext.Width;
+            PositionRunsOnScreen();
+
+            UpdateMaximumRunWidth();
+        }
+
+        private void PositionRunsOnScreen(Boolean isInitializationPhase = true)
+        {
+            Double runWidth = RunInProgress.Width;
             Double nextPivotPoint = _spacingBetweenRuns + runWidth;
 
-            // Compute the start abscissa of the runs 
-            Double startAbscissa = (_itemsControlWidth - (runWidth * runs.Count + _spacingBetweenRuns * (runs.Count - 1))) / 2.0;
+            // Compute the start abscissa of the runs .
+            Double startAbscissa = (_itemsControlWidth - (runWidth * _runs.Count + _spacingBetweenRuns * (_runs.Count - 1))) / 2.0;
 
-            foreach (var run in runs)
+            for (Int32 runIndex = 0; runIndex < _runs.Count; ++runIndex)
             {
-                abscissaByRun.Add(run, startAbscissa + nextPivotPoint * abscissaByRun.Count);
-                TranslateItemHorizontally(run, startAbscissa + nextPivotPoint * (abscissaByRun.Count - 1));
+                DraggableButton run = _runs[runIndex];
+                Double abscissa = startAbscissa + nextPivotPoint * runIndex;
+                if (isInitializationPhase)
+                {
+                    _abscissaByRun.Add(run, abscissa);
+                    TranslateItemHorizontally(run, abscissa);
+                    continue;
+                }
+
+                if (_abscissaByRun.ContainsKey(run))
+                {
+                    TranslateItemHorizontally(run, abscissa);
+                    _abscissaByRun[run] = abscissa;
+                }
             }
         }
 
         private void ComputeAbscissaCases(ref Dictionary<Int32, List<Double>> abscissaByNumberOfRunsCases)
         {
             abscissaByNumberOfRunsCases = new Dictionary<Int32, List<Double>>();
-            Double runWidth = _runs.FirstOrDefault().DBDataContext.Width;
+            Double runWidth = RunInProgress.Width;
             Int32 maximumNumberOfRuns = (Int32)Math.Floor(_itemsControlWidth / (runWidth + _spacingBetweenRuns));
 
             for (Int32 iRunCase = _minimumNumberOfRuns; iRunCase <= maximumNumberOfRuns; ++iRunCase)
@@ -309,6 +363,38 @@ namespace MCROrganizer.Core.ViewModel
 
             InitializeRuns(ref _runs, ref _abscissaByRun, _runs?.Count == 0);
             ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
+        }
+
+        private void UpdateRuns(RunParameter updatedRunParameter, Double value)
+        {
+            _runs.Select(x => x.DBDataContext).ToList().ForEach(x => x.Width = value);
+             switch (updatedRunParameter)
+             {
+                 case RunParameter.Width:
+                    PositionRunsOnScreen(false);
+                    ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
+                    break;
+                 case RunParameter.Height:
+                     break;
+             }
+        }
+
+        private void UpdateMaximumRunWidth()
+        {
+            DraggableButtonDataContext firstRunData = _runs.FirstOrDefault().DBDataContext;
+            DraggableButtonDataContext lastRunData = _runs.LastOrDefault().DBDataContext;
+            if (AbscissaByRun.TryGetValue(firstRunData.Control, out Double firstRunAbscissa) &&
+                AbscissaByRun.TryGetValue(lastRunData.Control, out Double lastRunAbscissa))
+            {
+                // Compute the remaining available space to the left and to the right of the runs.
+                Double remainingSpace = firstRunAbscissa + (_itemsControlWidth - lastRunAbscissa);
+
+                // Compute the max possible run width by adding the remaining space to any run width and distribute it to each run.
+                RunWidthMax = (firstRunData.Width + remainingSpace) / _runs.Count;
+
+                if (!ItemsControlWidth.IsInRange(RunWidthMax * _runs.Count + _spacingBetweenRuns))
+                    System.Diagnostics.Debug.WriteLine("Something went wrong with the max run width calculation");
+            }
         }
         #endregion
     }
