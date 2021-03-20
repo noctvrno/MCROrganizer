@@ -52,7 +52,7 @@ namespace MCROrganizer.Core.ViewModel
             set => _controlHeight = value;
         }
 
-        // Specified width for each added run. This setting is controlled using a cotenxtual menu in the main control.
+        // Specified width for each added run. This setting is controlled using a contextual menu in the main control.
         public Double _specifiedRunWidth = 0.0;
         public Double SpecifiedRunWidth
         {
@@ -61,7 +61,20 @@ namespace MCROrganizer.Core.ViewModel
             {
                 _specifiedRunWidth = value;
                 UpdateRuns(RunParameter.Width, value);
-                NotifyPropertyChanged("SpecifiedRunWidth");
+                NotifyPropertyChanged(nameof(SpecifiedRunWidth));
+            }
+        }
+
+        // Specified height for each added run. This setting is controlled using a contextual menu in the main control.
+        public Double _specifiedRunHeight = 0.0;
+        public Double SpecifiedRunHeight
+        {
+            get => _specifiedRunHeight;
+            set
+            {
+                _specifiedRunHeight = value;
+                UpdateRuns(RunParameter.Height, value);
+                NotifyPropertyChanged(nameof(SpecifiedRunHeight));
             }
         }
 
@@ -73,7 +86,19 @@ namespace MCROrganizer.Core.ViewModel
             set
             {
                 _runWidthMax = value;
-                NotifyPropertyChanged("RunWidthMax");
+                NotifyPropertyChanged(nameof(RunWidthMax));
+            }
+        }
+
+        // Maximum height that one run can have. This is something constant for all runs.
+        public Double _runHeightMax = Double.PositiveInfinity;
+        public Double RunHeightMax
+        {
+            get => _runHeightMax;
+            set
+            {
+                _runHeightMax = value;
+                NotifyPropertyChanged(nameof(RunHeightMax));
             }
         }
 
@@ -140,8 +165,8 @@ namespace MCROrganizer.Core.ViewModel
             set
             {
                 _runInProgress = value;
-                NotifyPropertyChanged("RunInProgress");
-                NotifyPropertyChanged("IsCurrentRunLogoSet");
+                NotifyPropertyChanged(nameof(RunInProgress));
+                NotifyPropertyChanged(nameof(IsCurrentRunLogoSet));
             }
         }
 
@@ -163,6 +188,7 @@ namespace MCROrganizer.Core.ViewModel
             }
 
             SpecifiedRunWidth = _runInProgress.Width;
+            SpecifiedRunHeight = _runInProgress.Height;
         }
         #endregion
 
@@ -206,7 +232,7 @@ namespace MCROrganizer.Core.ViewModel
                 if (runIndex == selectedRunIndex)
                     continue;
 
-                // Runs to the left of the current one will be considered finished and the ones to left are considered pending.
+                // Runs to the left of the current one will be considered finished and the ones to the right are considered pending.
                 _runs[runIndex].DBDataContext.RunState = runIndex < selectedRunIndex ? RunState.Finished : RunState.Pending;
             }
         }
@@ -230,8 +256,11 @@ namespace MCROrganizer.Core.ViewModel
             if (!_abscissaByNumberOfRunsCases.ContainsKey(_runs.Count + 1))
                 return;
 
-            // After adding a run we need to update the abscissas and the data structures.
-            _runs.Add(new DraggableButton(this, specifiedWidth: _specifiedRunWidth));
+            // After adding a run we need to update the properties and the data structures.
+            var newRun = new DraggableButton(this);
+            newRun.DBDataContext.Width = _specifiedRunWidth;
+            newRun.DBDataContext.Height = _specifiedRunHeight;
+            _runs.Add(newRun);
             UpdateAbscissasAndContainers();
         }
 
@@ -307,7 +336,7 @@ namespace MCROrganizer.Core.ViewModel
             Double runWidth = RunInProgress.Width;
             Double nextPivotPoint = _spacingBetweenRuns + runWidth;
 
-            // Compute the start abscissa of the runs .
+            // Compute the start abscissa of the runs.
             Double startAbscissa = (_itemsControlWidth - (runWidth * _runs.Count + _spacingBetweenRuns * (_runs.Count - 1))) / 2.0;
 
             for (Int32 runIndex = 0; runIndex < _runs.Count; ++runIndex)
@@ -367,16 +396,24 @@ namespace MCROrganizer.Core.ViewModel
 
         private void UpdateRuns(RunParameter updatedRunParameter, Double value)
         {
-            _runs.Select(x => x.DBDataContext).ToList().ForEach(x => x.Width = value);
-             switch (updatedRunParameter)
-             {
-                 case RunParameter.Width:
+            IEnumerable<DraggableButtonDataContext> runsData = _runs.Select(x => x.DBDataContext);
+            switch (updatedRunParameter)
+            {
+                case RunParameter.Width:
+                    foreach (var runData in runsData)
+                    {
+                        runData.Width = value;
+                    }
                     PositionRunsOnScreen(false);
                     ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
                     break;
-                 case RunParameter.Height:
-                     break;
-             }
+                case RunParameter.Height:
+                    foreach (var runData in runsData)
+                    {
+                        runData.Height = value;
+                    }
+                    break;
+            }
         }
 
         private void UpdateMaximumRunWidth()

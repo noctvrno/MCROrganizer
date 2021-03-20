@@ -72,7 +72,7 @@
             <MenuItem Header="Edit Run Dimensions">
                 <custom:EditRunDimensionMenuItem utils:MenuItemProperties.DimensionText="Width:" custom:EditRunDimensionMenuItem.DimensionValueMin="0" custom:EditRunDimensionMenuItem.DimensionValueMax="{Binding Path=PlacementTarget.DataContext.RunWidthMax, RelativeSource={RelativeSource AncestorType=ContextMenu}}" custom:EditRunDimensionMenuItem.DimensionValue="{Binding Path=PlacementTarget.DataContext.SpecifiedRunWidth, RelativeSource={RelativeSource AncestorType=ContextMenu}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Separator/>
-                <custom:EditRunDimensionMenuItem utils:MenuItemProperties.DimensionText="Height:" />
+                <custom:EditRunDimensionMenuItem utils:MenuItemProperties.DimensionText="Height:" custom:EditRunDimensionMenuItem.DimensionValueMin="0" custom:EditRunDimensionMenuItem.DimensionValueMax="{Binding Path=PlacementTarget.DataContext.RunWidthMax, RelativeSource={RelativeSource AncestorType=ContextMenu}}" custom:EditRunDimensionMenuItem.DimensionValue="{Binding Path=PlacementTarget.DataContext.SpecifiedRunHeight, RelativeSource={RelativeSource AncestorType=ContextMenu}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Separator/>
                 <custom:EditRunDimensionMenuItem utils:MenuItemProperties.DimensionText="Spacing:" />
             </MenuItem>

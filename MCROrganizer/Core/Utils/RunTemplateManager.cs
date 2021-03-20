@@ -88,7 +88,6 @@ namespace MCROrganizer.Core.Utils
             where T : UserControlDataContext
             where U : System.Windows.Controls.UserControl
         {
-
             OpenFileDialog fileBrowserDialog = null;
             if (browseForFile)
             {

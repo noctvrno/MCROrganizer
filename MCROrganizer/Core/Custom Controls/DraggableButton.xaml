@@ -22,7 +22,7 @@
                 </Setter.Value>
             </Setter>
             <Setter Property="Width" Value="{Binding Width, Mode=TwoWay}" />
-            <Setter Property="Height" Value="{Binding Height}" />
+            <Setter Property="Height" Value="{Binding Height, Mode=TwoWay}" />
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
     </UserControl.Resources>

@@ -25,12 +25,6 @@ namespace MCROrganizer.Core.CustomControls
     // Whenever the DraggableButton is instantiated, we could always access its DataContext and get/set whatever bound property we would like.
     public class DraggableButtonDataContext : UserControlDataContext
     {
-        public DraggableButtonDataContext(Double specifiedWidthFromMainControl, Double specifiedHeightFromMainControl)
-        {
-            Width = specifiedWidthFromMainControl;
-            Height = specifiedHeightFromMainControl;
-        }
-
         #region Customization Properties
         // Run name.
         private String _name = "DS";
@@ -78,10 +72,20 @@ namespace MCROrganizer.Core.CustomControls
             set
             {
                 _width = value;
-                NotifyPropertyChanged("Width");
+                NotifyPropertyChanged(nameof(Width));
             }
         }
-        public Double Height { get; set; } = 50.0;
+
+        private Double _height = 50.0;
+        public Double Height
+        {
+            get => _height;
+            set
+            {
+                _height = value;
+                NotifyPropertyChanged(nameof(Height));
+            }
+        }
         #endregion
 
         #region Two-Way Helper DataBinding Properties
@@ -199,10 +203,10 @@ namespace MCROrganizer.Core.CustomControls
         #endregion
 
         #region Initialization
-        public DraggableButton(ControlLogic parent, DraggableButtonDataContext data = null, Double specifiedWidth = 50.0, Double specifiedHeight = 50.0)
+        public DraggableButton(ControlLogic parent, DraggableButtonDataContext data = null)
         {
-            // data will be null for every instantiation of a run, except for a load because in that case, we dserialize the data from a json file.
-            DataContext = _dataContext = data ?? new DraggableButtonDataContext(specifiedWidth, specifiedHeight);
+            // data will be null for every instantiation of a run, except for a load because in that case, we deserialize the data from a json file.
+            DataContext = _dataContext = data ?? new DraggableButtonDataContext();
             _dataContext.Control = this;
             InitializeComponent();
             _isDragging = false;
