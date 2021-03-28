@@ -78,6 +78,19 @@ namespace MCROrganizer.Core.ViewModel
             }
         }
 
+        // Spacing
+        private Double _specifiedRunSpacing = 20.0;
+        public Double SpecifiedRunSpacing
+        {
+            get => _specifiedRunSpacing;
+            set
+            {
+                _specifiedRunSpacing = value;
+                UpdateRuns(RunParameter.Spacing, value);
+                NotifyPropertyChanged(nameof(SpecifiedRunSpacing));
+            }
+        }
+
         // Maximum width that one run can have. This is something constant for all runs.
         public Double _runWidthMax = Double.PositiveInfinity;
         public Double RunWidthMax
@@ -102,6 +115,18 @@ namespace MCROrganizer.Core.ViewModel
             }
         }
 
+        // Maximum spacing between runs. Must be limited in the future.
+        public Double _runSpacingMax = Double.PositiveInfinity;
+        public Double RunSpacingMax
+        {
+            get => _runSpacingMax;
+            set
+            {
+                _runSpacingMax = value;
+                NotifyPropertyChanged(nameof(RunSpacingMax));
+            }
+        }
+
         // Margins for the ItemsControl
         private Thickness _itemsControlMargins = new Thickness(20.0, 10.0, 20.0, 10.0);
         public Thickness ItemsControlMargins => _itemsControlMargins;
@@ -109,9 +134,6 @@ namespace MCROrganizer.Core.ViewModel
         // Width of the ItemsControl
         private Double _itemsControlWidth = 0.0;
         public Double ItemsControlWidth => _itemsControlWidth;
-
-        // Spacing
-        private Double _spacingBetweenRuns = 20.0;
 
         // Template manager.
         private RunTemplateManager _runTemplateManager = null;
@@ -189,6 +211,7 @@ namespace MCROrganizer.Core.ViewModel
 
             SpecifiedRunWidth = _runInProgress.Width;
             SpecifiedRunHeight = _runInProgress.Height;
+            SpecifiedRunSpacing = _runInProgress.Spacing;
         }
         #endregion
 
@@ -334,10 +357,10 @@ namespace MCROrganizer.Core.ViewModel
         private void PositionRunsOnScreen(Boolean isInitializationPhase = true)
         {
             Double runWidth = RunInProgress.Width;
-            Double nextPivotPoint = _spacingBetweenRuns + runWidth;
+            Double nextPivotPoint = _specifiedRunSpacing + runWidth;
 
             // Compute the start abscissa of the runs.
-            Double startAbscissa = (_itemsControlWidth - (runWidth * _runs.Count + _spacingBetweenRuns * (_runs.Count - 1))) / 2.0;
+            Double startAbscissa = (_itemsControlWidth - (runWidth * _runs.Count + _specifiedRunSpacing * (_runs.Count - 1))) / 2.0;
 
             for (Int32 runIndex = 0; runIndex < _runs.Count; ++runIndex)
             {
@@ -362,16 +385,16 @@ namespace MCROrganizer.Core.ViewModel
         {
             abscissaByNumberOfRunsCases = new Dictionary<Int32, List<Double>>();
             Double runWidth = RunInProgress.Width;
-            Int32 maximumNumberOfRuns = (Int32)Math.Floor(_itemsControlWidth / (runWidth + _spacingBetweenRuns));
+            Int32 maximumNumberOfRuns = (Int32)Math.Floor(_itemsControlWidth / (runWidth + _specifiedRunSpacing));
 
             for (Int32 iRunCase = _minimumNumberOfRuns; iRunCase <= maximumNumberOfRuns; ++iRunCase)
             {
-                Double startAbscissa = (_itemsControlWidth - (runWidth * iRunCase + _spacingBetweenRuns * (iRunCase - 1))) / 2.0;
+                Double startAbscissa = (_itemsControlWidth - (runWidth * iRunCase + _specifiedRunSpacing * (iRunCase - 1))) / 2.0;
                 var abscissas = new List<Double> { startAbscissa };
 
                 for (Int32 iRun = 0; iRun < iRunCase; ++iRun)
                 {
-                    Double nextPivotPoint = (_spacingBetweenRuns + runWidth) * iRun;
+                    Double nextPivotPoint = (_specifiedRunSpacing + runWidth) * iRun;
 
                     if (!abscissaByNumberOfRunsCases.ContainsKey(iRunCase))
                         abscissaByNumberOfRunsCases.Add(iRunCase, abscissas);
@@ -413,6 +436,14 @@ namespace MCROrganizer.Core.ViewModel
                         runData.Height = value;
                     }
                     break;
+                case RunParameter.Spacing:
+                    foreach (var runData in runsData)
+                    {
+                        runData.Spacing = value;
+                    }
+                    PositionRunsOnScreen(false);
+                    ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
+                    break;
             }
         }
 
@@ -429,7 +460,7 @@ namespace MCROrganizer.Core.ViewModel
                 // Compute the max possible run width by adding the remaining space to any run width and distribute it to each run.
                 RunWidthMax = (firstRunData.Width + remainingSpace) / _runs.Count;
 
-                if (!ItemsControlWidth.IsInRange(RunWidthMax * _runs.Count + _spacingBetweenRuns))
+                if (!ItemsControlWidth.IsInRange(RunWidthMax * _runs.Count + _specifiedRunSpacing))
                     System.Diagnostics.Debug.WriteLine("Something went wrong with the max run width calculation");
             }
         }

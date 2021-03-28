@@ -86,6 +86,9 @@ namespace MCROrganizer.Core.CustomControls
                 NotifyPropertyChanged(nameof(Height));
             }
         }
+
+        // Spacing between this run and the next (might be variable in the future).
+        public Double Spacing { get; set; } = 20.0;
         #endregion
 
         #region Two-Way Helper DataBinding Properties
