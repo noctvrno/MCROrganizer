@@ -11,8 +11,9 @@ namespace MCROrganizer.Core.Utils
     {
         private static String _baseDirectoryPath = Environment.CurrentDirectory;
         private static String _projectPath = Directory.GetParent(_baseDirectoryPath).Parent.FullName;
-        private static String _imagePath = Path.Combine(_projectPath, @"Data\Images\");
-        private static String _generalDataPath = Path.Combine(_projectPath, @"Data\General\");
+        private static String _dataPath = Path.Combine(_projectPath, "Data");
+        private static String _imagePath = Path.Combine(_dataPath, "Images");
+        private static String _generalDataPath = Path.Combine(_dataPath, "General");
         private static String _extension = ".mcro";
         private static String _generalDataFilePath = _generalDataPath + "General" + _extension;
         private static String _MCROFilterString = "MCRO Files (*" + _extension + ")|";

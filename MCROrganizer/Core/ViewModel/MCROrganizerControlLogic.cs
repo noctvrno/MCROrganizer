@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -156,22 +157,22 @@ namespace MCROrganizer.Core.ViewModel
         private Dictionary<Int32, List<Double>> _abscissaByNumberOfRunsCases = null;
 
         // Add Run Command.
-        private static ImageSource _addRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "AddRun.png"));
+        private static ImageSource _addRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "AddRun.png")));
         public ImageSource AddRunImage => _addRunImage;
         public ICommand AddRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => AddRun()));
 
         // Save Run Template Command.
-        private static ImageSource _saveRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SaveRun.png"));
+        private static ImageSource _saveRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "SaveRun.png")));
         public ImageSource SaveRunImage => _saveRunImage;
         public ICommand SaveRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _runTemplateManager.Save()));
 
         // Save Run As Template Command.
-        private static ImageSource _saveRunAsImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SaveRunAs.png"));
+        private static ImageSource _saveRunAsImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "SaveRunAs.png")));
         public ImageSource SaveRunAsImage => _saveRunAsImage;
         public ICommand SaveRunAsCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _runTemplateManager.SaveAs()));
 
         // Load Run Template Command.
-        private static ImageSource _loadRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "LoadRun.png"));
+        private static ImageSource _loadRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "LoadRun.png")));
         public ImageSource LoadRunImage => _loadRunImage;
         public ICommand LoadRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => LoadRunTemplate()));
 
@@ -205,8 +206,8 @@ namespace MCROrganizer.Core.ViewModel
                 LoadRunTemplate(false);
             else
             {
-                InitializeRuns(ref _runs, ref _abscissaByRun);
-                ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
+                InitializeRuns();
+                ComputeAbscissaCases();
             }
 
             SpecifiedRunWidth = _runInProgress.Width;
@@ -328,22 +329,22 @@ namespace MCROrganizer.Core.ViewModel
         /// Initializes a default number of runs (two) and aligns them to the center of the screen.
         /// This method should be called when the user creates a default template.
         /// </summary>
-        private void InitializeRuns(ref ObservableCollection<DraggableButton> runs, ref Dictionary<DraggableButton, Double> abscissaByRun, Boolean isDefaultTemplate = true)
+        private void InitializeRuns(Boolean isDefaultTemplate = true)
         {
             if (isDefaultTemplate)
             {
-                runs = new ObservableCollection<DraggableButton>()
+                _runs = new ObservableCollection<DraggableButton>()
                 {
                     new DraggableButton(this),
                     new DraggableButton(this)
                 };
 
-                SetRunAsCurrent(runs.FirstOrDefault());
+                SetRunAsCurrent(_runs.FirstOrDefault());
             }
             else
                 RunInProgress = _runs?.FirstOrDefault(x => x.DBDataContext.RunState == RunState.InProgress)?.DBDataContext; // Update the active run when loading template.
 
-            abscissaByRun = new Dictionary<DraggableButton, Double>();
+            _abscissaByRun = new Dictionary<DraggableButton, Double>();
 
             // Compute the actual width of the ItemsControl (where the buttons will be placed).
             _itemsControlWidth = _controlWidth - _itemsControlMargins.Left - _itemsControlMargins.Right;
@@ -381,9 +382,9 @@ namespace MCROrganizer.Core.ViewModel
             }
         }
 
-        private void ComputeAbscissaCases(ref Dictionary<Int32, List<Double>> abscissaByNumberOfRunsCases)
+        private void ComputeAbscissaCases()
         {
-            abscissaByNumberOfRunsCases = new Dictionary<Int32, List<Double>>();
+            _abscissaByNumberOfRunsCases = new Dictionary<Int32, List<Double>>();
             Double runWidth = RunInProgress.Width;
             Int32 maximumNumberOfRuns = (Int32)Math.Floor(_itemsControlWidth / (runWidth + _specifiedRunSpacing));
 
@@ -396,8 +397,8 @@ namespace MCROrganizer.Core.ViewModel
                 {
                     Double nextPivotPoint = (_specifiedRunSpacing + runWidth) * iRun;
 
-                    if (!abscissaByNumberOfRunsCases.ContainsKey(iRunCase))
-                        abscissaByNumberOfRunsCases.Add(iRunCase, abscissas);
+                    if (!_abscissaByNumberOfRunsCases.ContainsKey(iRunCase))
+                        _abscissaByNumberOfRunsCases.Add(iRunCase, abscissas);
                     else
                         abscissas.Add(startAbscissa + nextPivotPoint);
                 }
@@ -413,8 +414,10 @@ namespace MCROrganizer.Core.ViewModel
                 _runs.Add(new DraggableButton(this, runData));
             }
 
-            InitializeRuns(ref _runs, ref _abscissaByRun, _runs?.Count == 0);
-            ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
+            InitializeRuns(_runs?.Count == 0);
+            ComputeAbscissaCases();
+        }
+
         }
 
         private void UpdateRuns(RunParameter updatedRunParameter, Double value)
@@ -428,7 +431,7 @@ namespace MCROrganizer.Core.ViewModel
                         runData.Width = value;
                     }
                     PositionRunsOnScreen(false);
-                    ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
+                    ComputeAbscissaCases();
                     break;
                 case RunParameter.Height:
                     foreach (var runData in runsData)
@@ -442,7 +445,7 @@ namespace MCROrganizer.Core.ViewModel
                         runData.Spacing = value;
                     }
                     PositionRunsOnScreen(false);
-                    ComputeAbscissaCases(ref _abscissaByNumberOfRunsCases);
+                    ComputeAbscissaCases();
                     break;
             }
         }

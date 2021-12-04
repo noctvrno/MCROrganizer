@@ -12,6 +12,7 @@ using MCROrganizer.Core.View;
 using MCROrganizer.Core.Extensions;
 using MCROrganizer.Core.Utils;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace MCROrganizer.Core.CustomControls
 {
@@ -121,22 +122,22 @@ namespace MCROrganizer.Core.CustomControls
         }
 
         // Delete run command.
-        private static ImageSource _deleteRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "DeleteRun.png"));
+        private static ImageSource _deleteRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DeleteRun.png")));
         public static ImageSource DeleteRunImage => _deleteRunImage;
         public MCROCommand DeleteRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.RemoveRun(_control)));
 
         // Rename run command.
-        private static ImageSource _renameRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "RenameRun.png"));
+        private static ImageSource _renameRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "RenameRun.png")));
         public static ImageSource RenameRunImage => _renameRunImage;
         public MCROCommand RenameRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => MakeButtonEditable()));
 
         // Set run as current command.
-        private static ImageSource _setCurrentRunImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SetCurrentRun.png"));
+        private static ImageSource _setCurrentRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "SetCurrentRun.png")));
         public static ImageSource SetCurrentRunImage => _setCurrentRunImage;
         public MCROCommand SetCurrentRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.SetRunAsCurrent(_control)));
 
         // Set run logo command.
-        private static ImageSource _setRunLogoImage = new BitmapImage(new Uri(PathUtils.ImagePath + "SetRunLogo.png"));
+        private static ImageSource _setRunLogoImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "SetRunLogo.png")));
         public static ImageSource SetRunLogoImage => _setRunLogoImage;
         public MCROCommand SetRunLogoCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => SetRunLogo()));
 

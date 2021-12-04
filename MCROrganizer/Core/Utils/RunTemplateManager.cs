@@ -32,11 +32,11 @@ namespace MCROrganizer.Core.Utils
             {
                 jsonString = File.ReadAllText(PathUtils.GeneralDataFilePath);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                MessageBox.Show("General.mcro file is corrupt. The default template will be loaded.\nDEV NOTE:\n" + e, "Corrupt Data", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return String.Empty;
             }
+
             return JsonConvert.DeserializeObject<String>(jsonString);
         }
 
@@ -115,9 +115,8 @@ namespace MCROrganizer.Core.Utils
             {
                 jsonString = File.ReadAllText(_currentTemplatePath);
             }
-            catch (FileNotFoundException fnfe)
+            catch (FileNotFoundException)
             {
-                MessageBox.Show("The default template will be loaded.\nDEV NOTE:\n" + fnfe, "Corrupt Data", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return new Collection<T>();
             }
 
