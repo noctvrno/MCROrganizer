@@ -35,33 +35,20 @@ namespace MCROrganizer.Core.CustomControls
             set
             {
                 _name = value;
-                NotifyPropertyChanged("Name");
+                NotifyPropertyChanged(nameof(Name));
             }
         }
 
-        // State of the run.
-        private RunState _runState = RunState.Pending;
-        public RunState RunState
+        // Run properties.
+        private RunProperties _properties = null;
+        public RunProperties Properties
         {
-            get => _runState;
+            get => _properties;
             set
             {
-                _runState = value;
-                NotifyPropertyChanged("RunState");
-                NotifyPropertyChanged("RunStateColor");
-            }
-        }
-        public SolidColorBrush RunStateColor
-        {
-            get
-            {
-                return _runState switch
-                {
-                    RunState.Pending => new SolidColorBrush(Colors.Red),
-                    RunState.InProgress => new SolidColorBrush(Colors.Yellow),
-                    RunState.Finished => new SolidColorBrush(Colors.Green),
-                    RunState _ => throw new NotSupportedException("Unreachable")
-                };
+                _properties = value;
+               _properties?.NotifyPropertyChanged(nameof(_properties.BorderColor));
+                NotifyPropertyChanged(nameof(Properties));
             }
         }
 
@@ -134,7 +121,7 @@ namespace MCROrganizer.Core.CustomControls
         // Set run as current command.
         private static ImageSource _setCurrentRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "SetCurrentRun.png")));
         public static ImageSource SetCurrentRunImage => _setCurrentRunImage;
-        public MCROCommand SetCurrentRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.SetRunAsCurrent(_control)));
+        public MCROCommand SetCurrentRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.SetRunAsCurrent(_control.DBDataContext)));
 
         // Set run logo command.
         private static ImageSource _setRunLogoImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "SetRunLogo.png")));
@@ -148,6 +135,11 @@ namespace MCROrganizer.Core.CustomControls
             get => _runLogo;
             set => _runLogo = value;
         }
+        #endregion
+
+        #region Initialization
+        public DraggableButtonDataContext(RunProperties properties)
+            => Properties = properties;
         #endregion
 
         #region Communication fields
@@ -207,10 +199,10 @@ namespace MCROrganizer.Core.CustomControls
         #endregion
 
         #region Initialization
-        public DraggableButton(ControlLogic parent, DraggableButtonDataContext data = null)
+        public DraggableButton(ControlLogic parent, DraggableButtonDataContext data = null, RunProperties properties = null)
         {
             // data will be null for every instantiation of a run, except for a load because in that case, we deserialize the data from a json file.
-            DataContext = _dataContext = data ?? new DraggableButtonDataContext();
+            DataContext = _dataContext = data ?? new DraggableButtonDataContext(properties);
             _dataContext.Control = this;
             InitializeComponent();
             _isDragging = false;
@@ -262,5 +254,30 @@ namespace MCROrganizer.Core.CustomControls
             DBDataContext.MakeButtonEditable(false);
         }
         #endregion
+    }
+
+    public class RunProperties : UserControlDataContext
+    {
+        private SolidColorBrush _borderColor = null;
+        public SolidColorBrush BorderColor
+        {
+            get => _borderColor;
+            set => _borderColor = value;
+        }
+
+        private RunState _state = RunState.Pending;
+        public RunState State => _state;
+
+        public RunProperties(RunState state)
+        {
+            _state = state;
+            _borderColor = _state switch
+            {
+                RunState.Pending => new SolidColorBrush(Colors.Red),
+                RunState.InProgress => new SolidColorBrush(Colors.Yellow),
+                RunState.Finished => new SolidColorBrush(Colors.Green),
+                RunState _ => throw new NotSupportedException("Unreachable")
+            };
+        }
     }
 }

@@ -13,6 +13,14 @@
              Background="Gray">
     <UserControl.Resources>
         <utils:BooleanToDoubleConverter x:Key="b2d" />
+        <Image x:Key="DesignPendingRunImage" Source="{Binding DesignPendingRunImage}" x:Shared="false"/>
+        <Image x:Key="DesignInProgressRunImage" Source="{Binding DesignInProgressRunImage}" x:Shared="false"/>
+        <Image x:Key="DesignFinishedRunImage" Source="{Binding DesignFinishedRunImage}" x:Shared="false"/>
+        <Image x:Key="DesignBorderColorImage" Source="{Binding DesignBorderColorImage}" x:Shared="false"/>
+        <Style x:Key="PickColorMenuItem" TargetType="MenuItem">
+            <Setter Property="Command" Value="{Binding PickBorderColorCommand}" />
+            <Setter Property="Icon" Value="{StaticResource DesignBorderColorImage}" />
+        </Style>
     </UserControl.Resources>
     <!-- Bind the control's DataContext to the class that will govern all the logic. -->
     <!--<UserControl.DataContext>
@@ -42,6 +50,8 @@
     </Canvas>
     <UserControl.ContextMenu>
         <ContextMenu>
+            <MenuItem Header="Run Manipulation" IsEnabled="False" FontWeight="Bold" />
+            <Separator />
             <!-- Add Run command -->
             <MenuItem Header="Add Run" Command="{Binding Path=PlacementTarget.DataContext.AddRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Add another run.">
                 <MenuItem.Icon>
@@ -49,6 +59,8 @@
                 </MenuItem.Icon>
             </MenuItem>
             <Separator/>
+            <MenuItem Header="Save/Load" IsEnabled="False" FontWeight="Bold" />
+            <Separator />
             <!-- Save Run command -->
             <MenuItem Header="Save Run" Command="{Binding Path=PlacementTarget.DataContext.SaveRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Saves all the information about the current runs for reusability in the current template.">
                 <MenuItem.Icon>
@@ -61,7 +73,6 @@
                     <Image Source="{Binding SaveRunAsImage}" />
                 </MenuItem.Icon>
             </MenuItem>
-            <Separator/>
             <!-- Load Run -->
             <MenuItem Header="Load Run" Command="{Binding Path=PlacementTarget.DataContext.LoadRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Loads an already existing run template.">
                 <MenuItem.Icon>
@@ -69,12 +80,28 @@
                 </MenuItem.Icon>
             </MenuItem>
             <Separator/>
-            <MenuItem Header="Edit Run Dimensions">
+            <!-- Edit Run Dimensions -->
+            <MenuItem Header="Edit" IsEnabled="False" FontWeight="Bold" />
+            <Separator />
+            <MenuItem Header="Run Dimensions">
                 <custom:EditRunDimensionMenuItem utils:MenuItemProperties.DimensionText="Width:" custom:EditRunDimensionMenuItem.DimensionValueMin="0" custom:EditRunDimensionMenuItem.DimensionValueMax="{Binding Path=PlacementTarget.DataContext.RunWidthMax, RelativeSource={RelativeSource AncestorType=ContextMenu}}" custom:EditRunDimensionMenuItem.DimensionValue="{Binding Path=PlacementTarget.DataContext.SpecifiedRunWidth, RelativeSource={RelativeSource AncestorType=ContextMenu}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Separator/>
                 <custom:EditRunDimensionMenuItem utils:MenuItemProperties.DimensionText="Height:" custom:EditRunDimensionMenuItem.DimensionValueMin="0" custom:EditRunDimensionMenuItem.DimensionValueMax="{Binding Path=PlacementTarget.DataContext.RunHeightMax, RelativeSource={RelativeSource AncestorType=ContextMenu}}" custom:EditRunDimensionMenuItem.DimensionValue="{Binding Path=PlacementTarget.DataContext.SpecifiedRunHeight, RelativeSource={RelativeSource AncestorType=ContextMenu}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Separator/>
                 <custom:EditRunDimensionMenuItem utils:MenuItemProperties.DimensionText="Spacing:" custom:EditRunDimensionMenuItem.DimensionValueMin="0" custom:EditRunDimensionMenuItem.DimensionValueMax="{Binding Path=PlacementTarget.DataContext.SpacingRunMax, RelativeSource={RelativeSource AncestorType=ContextMenu}}" custom:EditRunDimensionMenuItem.DimensionValue="{Binding Path=PlacementTarget.DataContext.SpecifiedRunSpacing, RelativeSource={RelativeSource AncestorType=ContextMenu}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </MenuItem>
+            <Separator/>
+            <!-- Design -->
+            <MenuItem Header="Design" IsEnabled="False" FontWeight="Bold" />
+            <Separator />
+            <MenuItem Header="Pending Runs" Icon="{StaticResource DesignPendingRunImage}">
+                <MenuItem Header="Border Color" Style="{StaticResource PickColorMenuItem}" CommandParameter="{x:Static viewModel:RunState.Pending}" ToolTip="Edit the border color of pending runs." />
+            </MenuItem>
+            <MenuItem Header="In Progress Runs" Icon="{StaticResource DesignInProgressRunImage}">
+                <MenuItem Header="Border Color" Style="{StaticResource PickColorMenuItem}" CommandParameter="{x:Static viewModel:RunState.InProgress}" ToolTip="Edit the border color of in progress (current) runs." />
+            </MenuItem>
+            <MenuItem Header="Finished Runs" Icon="{StaticResource DesignFinishedRunImage}">
+                <MenuItem Header="Border Color" Style="{StaticResource PickColorMenuItem}" CommandParameter="{x:Static viewModel:RunState.Finished}" ToolTip="Edit the border color of finished runs." />
             </MenuItem>
         </ContextMenu>
     </UserControl.ContextMenu>
