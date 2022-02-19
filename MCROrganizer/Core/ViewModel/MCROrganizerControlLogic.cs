@@ -19,20 +19,6 @@ using Newtonsoft.Json.Converters;
 
 namespace MCROrganizer.Core.ViewModel
 {
-    public enum RunState
-    {
-        Pending,
-        InProgress,
-        Finished
-    }
-
-    public enum RunParameter
-    {
-        Width,
-        Height,
-        Spacing
-    }
-
     public class ControlLogic : UserControlDataContext
     {
         #region Customization properties
@@ -179,19 +165,6 @@ namespace MCROrganizer.Core.ViewModel
         private static ImageSource _loadRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "LoadRun.png")));
         public ImageSource LoadRunImage => _loadRunImage;
         public ICommand LoadRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => LoadRunTemplate()));
-
-        // Design Images.
-        private static ImageSource _designPendingRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "ColorPalettePendingRun.png")));
-        private static ImageSource _designInProgressRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "ColorPaletteInProgressRun.png")));
-        private static ImageSource _designFinishedRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "ColorPaletteFinishedRun.png")));
-        public ImageSource DesignPendingRunImage => _designPendingRunImage;
-        public ImageSource DesignInProgressRunImage => _designInProgressRunImage;
-        public ImageSource DesignFinishedRunImage => _designFinishedRunImage;
-
-        // Border Color Command.
-        private static ImageSource _designBorderColorImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DesignBorders.png")));
-        public ImageSource DesignBorderColorImage => _designBorderColorImage;
-        public ICommand PickBorderColorCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(runState => PickBorderColor((RunState)runState)));
 
         // View object.
         private MainControl _userControl = null;
@@ -462,23 +435,45 @@ namespace MCROrganizer.Core.ViewModel
             ComputeAbscissaCases();
         }
 
-        private void PickBorderColor(RunState runState)
+        public void DesignRun(RunState runState, CustomizableRunElements customizableRunElements)
         {
             RunProperties pickedGeneralRunProperties = _generalRunProperties[runState];
-            Int32 customColor = BitConverter.ToInt32(new byte[] { pickedGeneralRunProperties.BorderColor.Color.R, pickedGeneralRunProperties.BorderColor.Color.G, pickedGeneralRunProperties.BorderColor.Color.B, 0 }, 0);
+            Int32 customColor = 0;
+            System.Drawing.Color selectedColor = new();
+
+            switch (customizableRunElements)
+            {
+                case CustomizableRunElements.Border:
+                    customColor = BitConverter.ToInt32(new byte[] { pickedGeneralRunProperties.BorderColor.Color.R, pickedGeneralRunProperties.BorderColor.Color.G, pickedGeneralRunProperties.BorderColor.Color.B, 0 }, 0);
+                    selectedColor = System.Drawing.Color.FromArgb(pickedGeneralRunProperties.BorderColor.Color.A, pickedGeneralRunProperties.BorderColor.Color.R, pickedGeneralRunProperties.BorderColor.Color.G, pickedGeneralRunProperties.BorderColor.Color.B);
+                    break;
+                case CustomizableRunElements.Background:
+                    customColor = BitConverter.ToInt32(new byte[] { pickedGeneralRunProperties.BackgroundColor.Color.R, pickedGeneralRunProperties.BackgroundColor.Color.G, pickedGeneralRunProperties.BackgroundColor.Color.B, 0 }, 0);
+                    selectedColor = System.Drawing.Color.FromArgb(pickedGeneralRunProperties.BackgroundColor.Color.A, pickedGeneralRunProperties.BackgroundColor.Color.R, pickedGeneralRunProperties.BackgroundColor.Color.G, pickedGeneralRunProperties.BackgroundColor.Color.B);
+                    break;
+            }
 
             ColorDialog colorDialog = new ColorDialog()
             {
                 AllowFullOpen = true,
                 FullOpen = true,
-                Color = System.Drawing.Color.FromArgb(pickedGeneralRunProperties.BorderColor.Color.A, pickedGeneralRunProperties.BorderColor.Color.R, pickedGeneralRunProperties.BorderColor.Color.G, pickedGeneralRunProperties.BorderColor.Color.B),
+                Color = selectedColor,
                 CustomColors = new Int32[] { customColor }
             };
 
             if (colorDialog.ShowDialog() != DialogResult.OK)
                 return;
 
-            pickedGeneralRunProperties.BorderColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
+            switch (customizableRunElements)
+            {
+                case CustomizableRunElements.Border:
+                    pickedGeneralRunProperties.BorderColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
+                    break;
+                case CustomizableRunElements.Background:
+                    pickedGeneralRunProperties.BackgroundColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
+                    break;
+
+            }
 
             foreach (var matchedRun in _runs.Select(x => x.DBDataContext).Where(x => x.Properties.State == runState))
             {

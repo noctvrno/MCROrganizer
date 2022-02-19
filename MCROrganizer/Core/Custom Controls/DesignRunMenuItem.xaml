@@ -1,0 +1,20 @@
+﻿<MenuItem x:Class="MCROrganizer.Core.CustomControls.DesignRunMenuItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:MCROrganizer.Core.CustomControls"
+             mc:Ignorable="d"
+             Loaded="OnDesignRunMenuItemLoaded">
+    <MenuItem.Resources>
+        <Image x:Key="DesignPendingRunImage" Source="{Binding DesignPendingRunImage}" x:Shared="false"/>
+        <Image x:Key="DesignInProgressRunImage" Source="{Binding DesignInProgressRunImage}" x:Shared="false"/>
+        <Image x:Key="DesignFinishedRunImage" Source="{Binding DesignFinishedRunImage}" x:Shared="false"/>
+        <Image x:Key="DesignBorderColorImage" Source="{Binding DesignBorderColorImage}" x:Shared="false"/>
+        <Image x:Key="DesignBackgroundColorImage" Source="{Binding DesignBackgroundColorImage}" x:Shared="false"/>
+    </MenuItem.Resources>
+    <!-- AttachedProperty for the parent MenuItem called RunStateProperty -->
+    <!-- Command and CommandParameter bindings for the child MenuItems. The parameter should be the CustomizableRunElements (rename) enum -->
+    <MenuItem Header="Border Color" Icon="{StaticResource DesignBorderColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.Border}" ToolTip="Edit the border color." />
+    <MenuItem Header="Background Color" Icon="{StaticResource DesignBackgroundColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.Background}" ToolTip="Edit the background color." />
+</MenuItem>

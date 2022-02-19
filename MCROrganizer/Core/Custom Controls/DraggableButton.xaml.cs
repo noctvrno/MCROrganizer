@@ -20,6 +20,19 @@ namespace MCROrganizer.Core.CustomControls
     /// Interaction logic for DraggableButton.xaml
     /// </summary>
     /// 
+    public enum RunState
+    {
+        Pending,
+        InProgress,
+        Finished
+    }
+
+    public enum RunParameter
+    {
+        Width,
+        Height,
+        Spacing
+    }
 
     // Normally, this would act as a wrapper over the Button's and TextBox' (soon TM) properties in case we would like to use the control statically (instantiate in XAML code)
     // The DraggableButton should only be used dynamically though (so no need to wrap a lot of properties).
@@ -265,6 +278,13 @@ namespace MCROrganizer.Core.CustomControls
             set => _borderColor = value;
         }
 
+        private SolidColorBrush _backgroundColor = null;
+        public SolidColorBrush BackgroundColor
+        {
+            get => _backgroundColor;
+            set => _backgroundColor = value;
+        }
+
         private RunState _state = RunState.Pending;
         public RunState State => _state;
 
@@ -278,6 +298,8 @@ namespace MCROrganizer.Core.CustomControls
                 RunState.Finished => new SolidColorBrush(Colors.Green),
                 RunState _ => throw new NotSupportedException("Unreachable")
             };
+
+            _backgroundColor = new SolidColorBrush(Colors.Transparent);
         }
     }
 }
