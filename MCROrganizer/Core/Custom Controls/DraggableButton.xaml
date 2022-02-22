@@ -32,7 +32,7 @@
             <Button.Content>
                 <Canvas VerticalAlignment="Center" HorizontalAlignment="Center" Width="{Binding Width}" Height="{Binding Height}" >
                     <Label Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" PreviewMouseWheel="OnLabelPreviewMouseWheel"/>
-                    <TextBox Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" attached:TextBoxProperties.IsFocused="{Binding IsFocused}" IsHitTestVisible="{Binding IsHitTestVisible}" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" Text="{Binding Name, Mode=TwoWay}" LostFocus="OnTextBoxLostFocus" />
+                    <TextBox Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" attached:TextBoxProperties.IsFocused="{Binding IsFocused}" IsHitTestVisible="{Binding IsHitTestVisible}" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" Text="{Binding Name, Mode=TwoWay}" Foreground="{Binding Properties.FontColor}" LostFocus="OnTextBoxLostFocus" />
                 </Canvas>
             </Button.Content>
             <Button.ContextMenu>

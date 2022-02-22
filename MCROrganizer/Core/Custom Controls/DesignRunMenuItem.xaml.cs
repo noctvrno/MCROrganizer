@@ -20,7 +20,8 @@ namespace MCROrganizer.Core.CustomControls
     public enum CustomizableRunElements
     {
         Border,
-        Background
+        Background,
+        Font
     };
 
     public class DesignRunMenuItemDataContext : UserControlDataContext
@@ -30,17 +31,19 @@ namespace MCROrganizer.Core.CustomControls
         #endregion
 
         #region Accessors
-        private static ImageSource _designBorderColorImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DesignBorders.png")));
-        private static ImageSource _designBackgroundColorImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DesignBackground.png")));
         private static ImageSource _designPendingRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "ColorPalettePendingRun.png")));
         private static ImageSource _designInProgressRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "ColorPaletteInProgressRun.png")));
         private static ImageSource _designFinishedRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "ColorPaletteFinishedRun.png")));
+        private static ImageSource _designBorderColorImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DesignBorders.png")));
+        private static ImageSource _designBackgroundColorImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DesignBackground.png")));
+        private static ImageSource _designFontColorImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DesignFontColor.png")));
 
         public ImageSource DesignPendingRunImage => _designPendingRunImage;
         public ImageSource DesignInProgressRunImage => _designInProgressRunImage;
         public ImageSource DesignFinishedRunImage => _designFinishedRunImage;
         public ImageSource DesignBorderColorImage => _designBorderColorImage;
         public ImageSource DesignBackgroundColorImage => _designBackgroundColorImage;
+        public ImageSource DesignFontColorImage => _designFontColorImage;
 
         public ControlLogic ParentControlLogic { get; set; } = null;
 

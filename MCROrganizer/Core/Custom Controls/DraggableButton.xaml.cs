@@ -285,6 +285,13 @@ namespace MCROrganizer.Core.CustomControls
             set => _backgroundColor = value;
         }
 
+        private SolidColorBrush _fontColor = null;
+        public SolidColorBrush FontColor
+        {
+            get => _fontColor;
+            set => _fontColor = value;
+        }
+
         private RunState _state = RunState.Pending;
         public RunState State => _state;
 
@@ -300,6 +307,7 @@ namespace MCROrganizer.Core.CustomControls
             };
 
             _backgroundColor = new SolidColorBrush(Colors.Transparent);
+            _fontColor = new SolidColorBrush(Colors.Black);
         }
     }
 }

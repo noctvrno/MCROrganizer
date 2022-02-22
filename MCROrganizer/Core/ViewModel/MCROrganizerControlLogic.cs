@@ -441,17 +441,16 @@ namespace MCROrganizer.Core.ViewModel
             Int32 customColor = 0;
             System.Drawing.Color selectedColor = new();
 
-            switch (customizableRunElements)
+            SolidColorBrush choiceColorBrush = customizableRunElements switch
             {
-                case CustomizableRunElements.Border:
-                    customColor = BitConverter.ToInt32(new byte[] { pickedGeneralRunProperties.BorderColor.Color.R, pickedGeneralRunProperties.BorderColor.Color.G, pickedGeneralRunProperties.BorderColor.Color.B, 0 }, 0);
-                    selectedColor = System.Drawing.Color.FromArgb(pickedGeneralRunProperties.BorderColor.Color.A, pickedGeneralRunProperties.BorderColor.Color.R, pickedGeneralRunProperties.BorderColor.Color.G, pickedGeneralRunProperties.BorderColor.Color.B);
-                    break;
-                case CustomizableRunElements.Background:
-                    customColor = BitConverter.ToInt32(new byte[] { pickedGeneralRunProperties.BackgroundColor.Color.R, pickedGeneralRunProperties.BackgroundColor.Color.G, pickedGeneralRunProperties.BackgroundColor.Color.B, 0 }, 0);
-                    selectedColor = System.Drawing.Color.FromArgb(pickedGeneralRunProperties.BackgroundColor.Color.A, pickedGeneralRunProperties.BackgroundColor.Color.R, pickedGeneralRunProperties.BackgroundColor.Color.G, pickedGeneralRunProperties.BackgroundColor.Color.B);
-                    break;
-            }
+                CustomizableRunElements.Border => pickedGeneralRunProperties.BorderColor,
+                CustomizableRunElements.Background => pickedGeneralRunProperties.BackgroundColor,
+                CustomizableRunElements.Font => pickedGeneralRunProperties.FontColor,
+                CustomizableRunElements _ => throw new NotSupportedException()
+            };
+
+            customColor = BitConverter.ToInt32(new byte[] { choiceColorBrush.Color.R, choiceColorBrush.Color.G, choiceColorBrush.Color.B, 0 }, 0);
+            selectedColor = System.Drawing.Color.FromArgb(choiceColorBrush.Color.A, choiceColorBrush.Color.R, choiceColorBrush.Color.G, choiceColorBrush.Color.B);
 
             ColorDialog colorDialog = new ColorDialog()
             {
@@ -472,7 +471,9 @@ namespace MCROrganizer.Core.ViewModel
                 case CustomizableRunElements.Background:
                     pickedGeneralRunProperties.BackgroundColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
                     break;
-
+                case CustomizableRunElements.Font:
+                    pickedGeneralRunProperties.FontColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
+                    break;
             }
 
             foreach (var matchedRun in _runs.Select(x => x.DBDataContext).Where(x => x.Properties.State == runState))
