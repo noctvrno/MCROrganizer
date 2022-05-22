@@ -21,10 +21,23 @@ namespace MCROrganizer.Core.View
     /// </summary>
     public partial class MainControl : UserControl
     {
+        private ViewModel.ControlLogic _dataContext = null;
         public MainControl()
         {
-            DataContext = new MCROrganizer.Core.ViewModel.ControlLogic(this);
+            DataContext = _dataContext = new ViewModel.ControlLogic(this);
             InitializeComponent();
+        }
+
+        private void OnUserControlChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (_dataContext == null)
+                return;
+
+            // The ItemsPanelTemplate of our ItemsControl where each run is placed is a Canvas because we need the ability to drag the runs.
+            // Canvases are not stretchable and we cannot change this.
+            // Whenever the window/main control resizes, then we'll need to update width of the ItemsControl and recompute and replace everything on the screen.
+            // Even if the ItemsControl was stretchable we couldn't have possible triggered the recomputation of abscissaCases in a clean way.
+            _dataContext.ItemsControlWidth = e.NewSize.Width;
         }
     }
 }

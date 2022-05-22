@@ -8,38 +8,34 @@
              xmlns:custom="clr-namespace:MCROrganizer.Core.CustomControls"
              xmlns:attached="clr-namespace:MCROrganizer.Core.Utils"
              mc:Ignorable="d" 
-             Width="{Binding ControlWidth}"
-             Height="{Binding ControlHeight}"
-             Background="Gray">
+             Background="Gray"
+             Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, Path=ActualHeight}"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch"
+             SizeChanged="OnUserControlChanged">
     <UserControl.Resources>
         <utils:BooleanToDoubleConverter x:Key="b2d" />
     </UserControl.Resources>
-    <!-- Bind the control's DataContext to the class that will govern all the logic. -->
-    <!--<UserControl.DataContext>
-        <viewModel:ControlLogic x:Name="controlLogic"/>
-    </UserControl.DataContext>-->
-    <Canvas Width="{Binding ControlWidth}" Height="{Binding ControlHeight}">
-        <Grid Margin="0 20 0 0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="{Binding IsCurrentRunLogoSet, Converter={StaticResource b2d}, ConverterParameter=25}" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Image Grid.Row="0" Source="{Binding RunInProgress.RunLogo}" HorizontalAlignment="Center" Width="{Binding ControlWidth}" Height="25" />
-            <ItemsControl x:Name="buttonsItemsControl" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="Auto" Margin="{Binding ItemsControlMargins}" ItemsSource="{Binding Runs}">
-                <ItemsControl.Style>
-                    <Style TargetType="{x:Type ItemsControl}">
-                        <Setter Property="ItemsPanel">
-                            <Setter.Value>
-                                <ItemsPanelTemplate>
-                                    <Canvas />
-                                </ItemsPanelTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ItemsControl.Style>
-            </ItemsControl>
-        </Grid>
-    </Canvas>
+    <Grid Margin="0 20 0 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding IsCurrentRunLogoSet, Converter={StaticResource b2d}, ConverterParameter=25}" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Image Grid.Row="0" Source="{Binding RunInProgress.RunLogo}" HorizontalAlignment="Center" Width="Auto" Height="25" />
+        <ItemsControl x:Name="buttonsItemsControl" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{Binding ItemsControlMargins}" ItemsSource="{Binding Runs}">
+            <ItemsControl.Style>
+                <Style TargetType="{x:Type ItemsControl}">
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ItemsControl.Style>
+        </ItemsControl>
+    </Grid>
     <UserControl.ContextMenu>
         <ContextMenu>
             <MenuItem Header="Run Manipulation" IsEnabled="False" FontWeight="Bold" />

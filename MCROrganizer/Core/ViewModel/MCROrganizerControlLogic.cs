@@ -124,7 +124,17 @@ namespace MCROrganizer.Core.ViewModel
 
         // Width of the ItemsControl
         private Double _itemsControlWidth = 0.0;
-        public Double ItemsControlWidth => _itemsControlWidth;
+        public Double ItemsControlWidth
+        {
+            get => _itemsControlWidth;
+            set
+            {
+                _itemsControlWidth = value;
+                UpdateMaximumRunWidth();
+                ComputeAbscissaCases();
+                PositionRunsOnScreen(false);
+            }
+        }
 
         // Template manager.
         private RunTemplateManager _runTemplateManager = null;
@@ -364,12 +374,8 @@ namespace MCROrganizer.Core.ViewModel
             _abscissaByRun = new Dictionary<DraggableButton, Double>();
 
             // Compute the actual width of the ItemsControl (where the buttons will be placed).
-            _itemsControlWidth = _controlWidth - _itemsControlMargins.Left - _itemsControlMargins.Right;
-            NotifyPropertyChanged("ItemsControlWidth");
-
+            ItemsControlWidth = _controlWidth - _itemsControlMargins.Left - _itemsControlMargins.Right;
             PositionRunsOnScreen();
-
-            UpdateMaximumRunWidth();
         }
 
         private void PositionRunsOnScreen(Boolean isInitializationPhase = true)
