@@ -47,7 +47,7 @@ namespace MCROrganizer.Core.CustomControls
 
         public ControlLogic ParentControlLogic { get; set; } = null;
 
-        public ICommand DesignRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => ParentControlLogic.DesignRun(_runState, (CustomizableRunElements)obj)));
+        public ICommand DesignRunCommand => new MCROCommand(obj => ParentControlLogic.DesignRun(_runState, (CustomizableRunElements)obj));
 
         public RunState RunState
         {

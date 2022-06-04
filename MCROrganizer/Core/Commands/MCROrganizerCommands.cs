@@ -12,9 +12,9 @@ namespace MCROrganizer.Core.Commands
         private readonly Predicate<object> _canExecute;
         private readonly Action<object> _execute;
 
-        public MCROCommand(Predicate<object> canExecute, Action<object> execute)
+        public MCROCommand(Action<object> execute, Predicate<object> canExecute = null)
         {
-            _canExecute = canExecute;
+            _canExecute = canExecute ?? (_ => true);
             _execute = execute;
         }
 

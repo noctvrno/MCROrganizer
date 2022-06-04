@@ -70,7 +70,7 @@ namespace MCROrganizer.Core.Utils
             SaveFileDialog folderBrowserDialog = new SaveFileDialog()
             {
                 RestoreDirectory = false,
-                Filter = PathUtils.MCROFilterString,
+                Filter = PathUtils.MCROFilter,
                 DefaultExt = PathUtils.Extension,
                 AddExtension = true,
             };
@@ -94,7 +94,7 @@ namespace MCROrganizer.Core.Utils
                 fileBrowserDialog = new OpenFileDialog()
                 {
                     InitialDirectory = PathUtils.ImagePath,
-                    Filter = PathUtils.MCROFilterString,
+                    Filter = PathUtils.MCROFilter,
                     DefaultExt = PathUtils.Extension,
                     AddExtension = true
                 };

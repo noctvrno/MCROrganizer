@@ -14,8 +14,6 @@ using MCROrganizer.Core.CustomControls;
 using MCROrganizer.Core.Extensions;
 using MCROrganizer.Core.Utils;
 using MCROrganizer.Core.View;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace MCROrganizer.Core.ViewModel
 {
@@ -24,20 +22,12 @@ namespace MCROrganizer.Core.ViewModel
         #region Customization properties
         private Int32 _minimumNumberOfRuns = 2;
 
-        // Width of the main control.
+        // Width of the main control. (must be deleted)
         private Double _controlWidth = 400.0;
         public Double ControlWidth
         {
             get => _controlWidth;
             set => _controlWidth = value;
-        }
-
-        // Height of the main control.
-        private Double _controlHeight = 800.0;
-        public Double ControlHeight
-        {
-            get => _controlHeight;
-            set => _controlHeight = value;
         }
 
         // Specified width for each added run. This setting is controlled using a contextual menu in the main control.
@@ -149,32 +139,32 @@ namespace MCROrganizer.Core.ViewModel
             set => _runs = value;
         }
 
-        // Main Hash Table that stores each run and their current abscissa.
+        // Main HashTable that stores each run and their current abscissa.
         private Dictionary<DraggableButton, Double> _abscissaByRun = null; // Each abscissa entry will be relative to the ItemsControl (the parent of all DraggableButtons).
         public Dictionary<DraggableButton, Double> AbscissaByRun => _abscissaByRun;
 
-        // Secondary Hash Table that stores each possible run number scenario next to their respective collection of abscissas.
+        // Secondary HashTable that stores each possible run number scenario next to their respective collection of abscissas.
         private Dictionary<Int32, List<Double>> _abscissaByNumberOfRunsCases = null;
 
         // Add Run Command.
         private static ImageSource _addRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "AddRun.png")));
         public ImageSource AddRunImage => _addRunImage;
-        public ICommand AddRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => AddRun()));
+        public ICommand AddRunCommand => new MCROCommand(_ => AddRun());
 
         // Save Run Template Command.
         private static ImageSource _saveRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "SaveRun.png")));
         public ImageSource SaveRunImage => _saveRunImage;
-        public ICommand SaveRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _runTemplateManager.Save()));
+        public ICommand SaveRunCommand => new MCROCommand(_ => _runTemplateManager.Save());
 
         // Save Run As Template Command.
         private static ImageSource _saveRunAsImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "SaveRunAs.png")));
         public ImageSource SaveRunAsImage => _saveRunAsImage;
-        public ICommand SaveRunAsCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _runTemplateManager.SaveAs()));
+        public ICommand SaveRunAsCommand => new MCROCommand(_ => _runTemplateManager.SaveAs());
 
         // Load Run Template Command.
         private static ImageSource _loadRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "LoadRun.png")));
         public ImageSource LoadRunImage => _loadRunImage;
-        public ICommand LoadRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => LoadRunTemplate()));
+        public ICommand LoadRunCommand => new MCROCommand(_ => LoadRunTemplate());
 
         // View object.
         private MainControl _userControl = null;

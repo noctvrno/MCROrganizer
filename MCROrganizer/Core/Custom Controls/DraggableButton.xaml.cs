@@ -124,22 +124,22 @@ namespace MCROrganizer.Core.CustomControls
         // Delete run command.
         private static ImageSource _deleteRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DeleteRun.png")));
         public static ImageSource DeleteRunImage => _deleteRunImage;
-        public MCROCommand DeleteRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.RemoveRun(_control)));
+        public MCROCommand DeleteRunCommand => new MCROCommand(_ => _control.DBParent.RemoveRun(_control));
 
         // Rename run command.
         private static ImageSource _renameRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "RenameRun.png")));
         public static ImageSource RenameRunImage => _renameRunImage;
-        public MCROCommand RenameRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => MakeButtonEditable()));
+        public MCROCommand RenameRunCommand => new MCROCommand(_ => MakeButtonEditable());
 
         // Set run as current command.
         private static ImageSource _setCurrentRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "SetCurrentRun.png")));
         public static ImageSource SetCurrentRunImage => _setCurrentRunImage;
-        public MCROCommand SetCurrentRunCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => _control.DBParent.SetRunAsCurrent(_control.DBDataContext)));
+        public MCROCommand SetCurrentRunCommand => new MCROCommand(_ => _control.DBParent.SetRunAsCurrent(_control.DBDataContext));
 
         // Set run logo command.
         private static ImageSource _setRunLogoImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "SetRunLogo.png")));
         public static ImageSource SetRunLogoImage => _setRunLogoImage;
-        public MCROCommand SetRunLogoCommand => new MCROCommand(new Predicate<object>(obj => true), new Action<object>(obj => SetRunLogo()));
+        public MCROCommand SetRunLogoCommand => new MCROCommand(_ => SetRunLogo());
 
         // Run logo.
         private ImageSource _runLogo = null;
@@ -186,7 +186,7 @@ namespace MCROrganizer.Core.CustomControls
             }
             catch
             {
-                MessageBox.Show("Could not load the image file. Please try again with a different image.", "MCROrganizer", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Could not load the image file. Please try again with a different image.", PathUtils.Caption, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 

@@ -8,7 +8,7 @@
              xmlns:custom="clr-namespace:MCROrganizer.Core.CustomControls"
              xmlns:attached="clr-namespace:MCROrganizer.Core.Utils"
              mc:Ignorable="d" 
-             Background="Gray"
+             Background="Transparent"
              Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, Path=ActualHeight}"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch"
