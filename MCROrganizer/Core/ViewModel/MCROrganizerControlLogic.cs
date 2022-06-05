@@ -109,7 +109,7 @@ namespace MCROrganizer.Core.ViewModel
         private Dictionary<RunState, RunProperties> _generalRunProperties = null;
 
         // Margins for the ItemsControl
-        private Thickness _itemsControlMargins = new Thickness(20.0, 10.0, 20.0, 10.0);
+        private Thickness _itemsControlMargins = new Thickness(0.0, 10.0, 0.0, 10.0);
         public Thickness ItemsControlMargins => _itemsControlMargins;
 
         // Width of the ItemsControl
@@ -282,6 +282,7 @@ namespace MCROrganizer.Core.ViewModel
             newRun.DBDataContext.Properties = _generalRunProperties[RunState.Pending]; // A new run is always added as the last run and, therefore, will always be pending.
             _runs.Add(newRun);
             UpdateAbscissasAndContainers();
+            UpdateMaximumRunWidth();
         }
 
         public void RemoveRun(DraggableButton deletedRun)
@@ -294,6 +295,7 @@ namespace MCROrganizer.Core.ViewModel
             _runs.Remove(deletedRun);
             _abscissaByRun.Remove(deletedRun);
             UpdateAbscissasAndContainers();
+            UpdateMaximumRunWidth();
         }
 
         /// <summary>

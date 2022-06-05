@@ -55,11 +55,7 @@ namespace MCROrganizer.Core.CustomControls
             {
                 if (Double.TryParse(value, out Double dimensionValue))
                 {
-                    if (dimensionValue.IsBetween(DimensionValueMin, DimensionValueMax))
-                        DimensionValue = dimensionValue;
-                    else
-                        DimensionValue = dimensionValue < DimensionValueMin ? DimensionValueMin : DimensionValueMax;
-
+                    DimensionValue = dimensionValue.Clamp(DimensionValueMin, DimensionValueMax);
                     _dimensionValueStr = DimensionValue.ToString();
                 }
                 else
