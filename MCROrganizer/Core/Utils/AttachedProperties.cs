@@ -36,28 +36,4 @@ namespace MCROrganizer.Core.Utils
         }
     }
     #endregion
-
-    #region MenuItem Properties
-    public class MenuItemProperties
-    {
-        // RunStateProperty.
-        public static DependencyProperty RunStateProperty = DependencyProperty.RegisterAttached("RunState", typeof(RunState), typeof(MenuItemProperties), new UIPropertyMetadata(RunState.Pending, OnRunStateChanged));
-
-        public static RunState GetRunState(DependencyObject dependencyObject)
-        {
-            return (RunState)dependencyObject.GetValue(RunStateProperty);
-        }
-
-        public static void SetRunState(DependencyObject dependencyObject, RunState value)
-        {
-            dependencyObject.SetValue(RunStateProperty, value);
-        }
-
-        public static void OnRunStateChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
-        {
-            if (dependencyObject is DesignRunMenuItem designRunMenuItem)
-                designRunMenuItem.DesignRunMenuItemDataContext.RunState = (RunState)dependencyPropertyChangedEventArgs.NewValue;
-        }
-    }
-    #endregion
 }

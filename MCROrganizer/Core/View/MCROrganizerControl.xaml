@@ -82,9 +82,9 @@
             <!-- Design -->
             <MenuItem Header="Design" IsEnabled="False" FontWeight="Bold" />
             <Separator />
-            <custom:DesignRunMenuItem Header="Pending Runs" Icon="{StaticResource DesignPendingRunImage}" attached:MenuItemProperties.RunState="{x:Static custom:RunState.Pending}"/>
-            <custom:DesignRunMenuItem Header="In Progress Runs" Icon="{StaticResource DesignInProgressRunImage}" attached:MenuItemProperties.RunState="{x:Static custom:RunState.InProgress}"/>
-            <custom:DesignRunMenuItem Header="Finished Runs" Icon="{StaticResource DesignFinishedRunImage}" attached:MenuItemProperties.RunState="{x:Static custom:RunState.Finished}"/>
+            <custom:DesignRunMenuItem Header="Pending Runs" Icon="{StaticResource DesignPendingRunImage}" RunState="{x:Static custom:RunState.Pending}"/>
+            <custom:DesignRunMenuItem Header="In Progress Runs" Icon="{StaticResource DesignInProgressRunImage}" RunState="{x:Static custom:RunState.InProgress}"/>
+            <custom:DesignRunMenuItem Header="Finished Runs" Icon="{StaticResource DesignFinishedRunImage}" RunState="{x:Static custom:RunState.Finished}"/>
         </ContextMenu>
     </UserControl.ContextMenu>
 </UserControl>

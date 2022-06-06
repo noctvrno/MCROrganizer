@@ -27,7 +27,7 @@ namespace MCROrganizer.Core.CustomControls
     public class DesignRunMenuItemDataContext : UserControlDataContext
     {
         #region Members
-        private RunState _runState = RunState.Pending;
+        private DesignRunMenuItem _control = null;
         #endregion
 
         #region Accessors
@@ -47,23 +47,50 @@ namespace MCROrganizer.Core.CustomControls
 
         public ControlLogic ParentControlLogic { get; set; } = null;
 
-        public ICommand DesignRunCommand => new MCROCommand(obj => ParentControlLogic.DesignRun(_runState, (CustomizableRunElements)obj));
+        public ICommand DesignRunCommand => new MCROCommand(obj => ParentControlLogic.DesignRun(RunState, (CustomizableRunElements)obj));
 
         public RunState RunState
         {
-            get => _runState;
-            set => _runState = value;
+            get => (RunState)_control.GetValue(DesignRunMenuItem.RunStateProperty);
+            set => _control.SetValue(DesignRunMenuItem.RunStateProperty, value);
+        }
+        #endregion
+
+        #region Initialization
+        public DesignRunMenuItemDataContext(DesignRunMenuItem control)
+        {
+            _control = control;
         }
         #endregion
     }
 
     public partial class DesignRunMenuItem : MenuItem
     {
+        #region Dependency Properties
+        public static DependencyProperty RunStateProperty = DependencyProperty.Register("RunState", typeof(RunState), typeof(DesignRunMenuItem), new FrameworkPropertyMetadata(RunState.Pending, OnRunStateChanged));
+
+        public static RunState GetRunState(DependencyObject dependencyObject)
+        {
+            return (RunState)dependencyObject.GetValue(RunStateProperty);
+        }
+
+        public static void SetRunState(DependencyObject dependencyObject, RunState value)
+        {
+            dependencyObject.SetValue(RunStateProperty, value);
+        }
+
+        public static void OnRunStateChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            if (dependencyObject is DesignRunMenuItem designRunMenuItem)
+                designRunMenuItem.DesignRunMenuItemDataContext.RunState = (RunState)dependencyPropertyChangedEventArgs.NewValue;
+        }
+        #endregion
+
         public DesignRunMenuItemDataContext DesignRunMenuItemDataContext { get; set; }
 
         public DesignRunMenuItem()
         {
-            DataContext = DesignRunMenuItemDataContext = new DesignRunMenuItemDataContext();
+            DataContext = DesignRunMenuItemDataContext = new DesignRunMenuItemDataContext(this);
             InitializeComponent();
         }
 
