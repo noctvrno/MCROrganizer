@@ -44,7 +44,7 @@ namespace MCROrganizer.Core.CustomControls
             set
             {
                 _dimensionText = value;
-                NotifyPropertyChanged("DimensionText");
+                NotifyPropertyChanged(nameof(DimensionText));
             }
         }
 
@@ -53,15 +53,12 @@ namespace MCROrganizer.Core.CustomControls
             get => _dimensionValueStr;
             set
             {
-                if (Double.TryParse(value, out Double dimensionValue))
-                {
-                    DimensionValue = dimensionValue.Clamp(DimensionValueMin, DimensionValueMax);
-                    _dimensionValueStr = DimensionValue.ToString();
-                }
-                else
+                if (!Double.TryParse(value, out Double dimensionValue))
                     return;
 
-                NotifyPropertyChanged("DimensionValueStr");
+                DimensionValue = dimensionValue.Clamp(DimensionValueMin, DimensionValueMax);
+                _dimensionValueStr = DimensionValue.ToString();
+                NotifyPropertyChanged(nameof(DimensionValueStr));
             }
         }
 
@@ -88,9 +85,10 @@ namespace MCROrganizer.Core.CustomControls
     public partial class EditRunDimensionMenuItem : UserControl
     {
         #region Dependency Properties
-        public static DependencyProperty DimensionValueProperty = DependencyProperty.RegisterAttached("DimensionValue", typeof(Double), typeof(EditRunDimensionMenuItem), new UIPropertyMetadata(0.0));
-        public static DependencyProperty DimensionValueMinProperty = DependencyProperty.RegisterAttached("DimensionValueMin", typeof(Double), typeof(EditRunDimensionMenuItem), new UIPropertyMetadata(0.0));
-        public static DependencyProperty DimensionValueMaxProperty = DependencyProperty.RegisterAttached("DimensionValueMax", typeof(Double), typeof(EditRunDimensionMenuItem), new UIPropertyMetadata(Double.PositiveInfinity));
+        public static DependencyProperty DimensionTextProperty = DependencyProperty.Register("DimensionText", typeof(String), typeof(EditRunDimensionMenuItem), new UIPropertyMetadata(String.Empty, OnDimensionTextChanged));
+        public static DependencyProperty DimensionValueProperty = DependencyProperty.Register("DimensionValue", typeof(Double), typeof(EditRunDimensionMenuItem), new FrameworkPropertyMetadata(0.0, OnDimensionValueChanged) { BindsTwoWayByDefault = true });
+        public static DependencyProperty DimensionValueMinProperty = DependencyProperty.Register("DimensionValueMin", typeof(Double), typeof(EditRunDimensionMenuItem), new UIPropertyMetadata(0.0));
+        public static DependencyProperty DimensionValueMaxProperty = DependencyProperty.Register("DimensionValueMax", typeof(Double), typeof(EditRunDimensionMenuItem), new UIPropertyMetadata(Double.PositiveInfinity));
 
         public static Double GetDimensionValue(DependencyObject dependencyObject)
         {
@@ -100,6 +98,13 @@ namespace MCROrganizer.Core.CustomControls
         public static void SetDimensionValue(DependencyObject dependencyObject, Double value)
         {
             dependencyObject.SetValue(DimensionValueProperty, value);
+        }
+
+        public static void OnDimensionValueChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            // Only update the DimensionValueStr, this will also go through proper checks for DimensionValue and set it accordingly.
+            if (dependencyObject is EditRunDimensionMenuItem editRunDimensionMenuItem)
+                editRunDimensionMenuItem.CustomMenuItemDataContext.DimensionValueStr = dependencyPropertyChangedEventArgs.NewValue.ToString();
         }
 
         public static Double GetDimensionValueMin(DependencyObject dependencyObject)
@@ -112,6 +117,12 @@ namespace MCROrganizer.Core.CustomControls
             dependencyObject.SetValue(DimensionValueMinProperty, value);
         }
 
+        public static void OnDimensionValueMinChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            if (dependencyObject is EditRunDimensionMenuItem editRunDimensionMenuItem)
+                editRunDimensionMenuItem.CustomMenuItemDataContext.DimensionValueMin = (Double)dependencyPropertyChangedEventArgs.NewValue;
+        }
+
         public static Double GetDimensionValueMax(DependencyObject dependencyObject)
         {
             return (Double)dependencyObject.GetValue(DimensionValueMaxProperty);
@@ -120,6 +131,28 @@ namespace MCROrganizer.Core.CustomControls
         public static void SetDimensionValueMax(DependencyObject dependencyObject, Double value)
         {
             dependencyObject.SetValue(DimensionValueMaxProperty, value);
+        }
+
+        public static void OnDimensionValueMaxChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            if (dependencyObject is EditRunDimensionMenuItem editRunDimensionMenuItem)
+                editRunDimensionMenuItem.CustomMenuItemDataContext.DimensionValueMax = (Double)dependencyPropertyChangedEventArgs.NewValue;
+        }
+
+        public static String GetDimensionText(DependencyObject dependencyObject)
+        {
+            return (String)dependencyObject.GetValue(DimensionTextProperty);
+        }
+
+        public static void SetDimensionText(DependencyObject dependencyObject, String value)
+        {
+            dependencyObject.SetValue(DimensionTextProperty, value);
+        }
+
+        public static void OnDimensionTextChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            if (dependencyObject is EditRunDimensionMenuItem editRunDimensionMenuItem)
+                editRunDimensionMenuItem.CustomMenuItemDataContext.DimensionText = dependencyPropertyChangedEventArgs.NewValue as String;
         }
         #endregion
 
