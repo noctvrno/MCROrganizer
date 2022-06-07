@@ -188,5 +188,13 @@
   <ItemGroup>
     <Resource Include="Data\Images\SetRunLogo.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Data\Images\ColorPaletteFinishedRun.png" />
+    <Resource Include="Data\Images\ColorPaletteInProgressRun.png" />
+    <Resource Include="Data\Images\ColorPalettePendingRun.png" />
+    <Resource Include="Data\Images\DesignBackground.png" />
+    <Resource Include="Data\Images\DesignBorders.png" />
+    <Resource Include="Data\Images\DesignFontColor.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

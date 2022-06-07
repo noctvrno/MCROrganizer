@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MCROrganizer.Core.Utils
 {
@@ -12,7 +8,7 @@ namespace MCROrganizer.Core.Utils
         private static String _baseDirectoryPath = Environment.CurrentDirectory;
         private static String _projectPath = Directory.GetParent(_baseDirectoryPath).Parent.FullName;
         private static String _dataPath = Path.Combine(_projectPath, "Data");
-        private static String _imagePath = Path.Combine(_dataPath, "Images");
+        private static String _imagePath = $"pack://application:,,,/{System.Reflection.Assembly.GetExecutingAssembly().FullName};component/Data/Images";
         private static String _generalDataPath = Path.Combine(_dataPath, "General");
         private static String _extension = ".mcro";
         private static String _generalDataFilePath = _generalDataPath + "General" + _extension;
