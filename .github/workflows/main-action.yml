@@ -30,18 +30,10 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 5.0.x
-    
-    # Setup NuGet.exe.
-    - name: Setup NuGet.exe
-      uses: NuGet/setup-nuget@v1.0.6
 
     # Add  MSBuild to the PATH.
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
-      
-    # Restore NuGet Packages.
-    - name: restore-nuget-packages
-      uses: IT-Service/restore-nuget-packages@v1
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers.
     - name: Restore the application
