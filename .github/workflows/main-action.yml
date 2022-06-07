@@ -54,5 +54,5 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: MSIX Package
-        path: ${{ env.Wap_Project_Directory }}\AppPackages
+        name: MCRO Package
+        path: ${{ env.Wap_Project_Directory }}\bin\Release
