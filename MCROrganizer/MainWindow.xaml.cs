@@ -18,11 +18,5 @@ namespace MCROrganizer.Core.View
         {
             InitializeComponent();
         }
-
-        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
-        {
-            RunTemplateManager.WriteToJSON(RunTemplateManager.CurrentTemplatePath, Path.Combine(PathUtils.GeneralDataPath, "General" + PathUtils.Extension));
-            Application.Current.Shutdown();
-        }
     }
 }

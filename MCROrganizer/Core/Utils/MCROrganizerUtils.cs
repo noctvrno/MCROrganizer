@@ -8,7 +8,8 @@ namespace MCROrganizer.Core.Utils
         private static String _baseDirectoryPath = Environment.CurrentDirectory;
         private static String _projectPath = Directory.GetParent(_baseDirectoryPath).Parent.FullName;
         private static String _dataPath = Path.Combine(_projectPath, "Data");
-        private static String _imagePath = $"pack://application:,,,/{System.Reflection.Assembly.GetExecutingAssembly().FullName};component/Data/Images";
+        private static String _appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+        private static String _imagePath = $"pack://application:,,,/{_appName};component/Data/Images";
         private static String _generalDataPath = Path.Combine(_dataPath, "General");
         private static String _extension = ".mcro";
         private static String _generalDataFilePath = _generalDataPath + "General" + _extension;
@@ -23,5 +24,6 @@ namespace MCROrganizer.Core.Utils
         public static String GeneralDataFilePath => _generalDataFilePath;
         public static String MCROFilter => _MCROFilter;
         public static String Caption => _caption;
+        public static String AppName => _appName;
     }
 }
