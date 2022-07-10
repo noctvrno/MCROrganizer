@@ -93,10 +93,10 @@ namespace MCROrganizer.Core.Utils
             {
                 fileBrowserDialog = new OpenFileDialog()
                 {
-                    InitialDirectory = PathUtils.ImagePath,
                     Filter = PathUtils.MCROFilter,
                     DefaultExt = PathUtils.Extension,
-                    AddExtension = true
+                    AddExtension = true,
+                    RestoreDirectory = true,
                 };
 
                 if (fileBrowserDialog.ShowDialog() != DialogResult.OK)

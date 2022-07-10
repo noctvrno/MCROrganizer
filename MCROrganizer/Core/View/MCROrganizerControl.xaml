@@ -8,7 +8,7 @@
              xmlns:custom="clr-namespace:MCROrganizer.Core.CustomControls"
              xmlns:attached="clr-namespace:MCROrganizer.Core.Utils"
              mc:Ignorable="d" 
-             Background="Transparent"
+             Background="Gray"
              Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, Path=ActualHeight}"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch"
@@ -18,10 +18,10 @@
     </UserControl.Resources>
     <Grid Margin="0 20 0 0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="{Binding IsCurrentRunLogoSet, Converter={StaticResource b2d}, ConverterParameter=25}" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Image Grid.Row="0" Source="{Binding RunInProgress.RunLogo}" HorizontalAlignment="Center" Width="Auto" Height="25" />
+        <Image Grid.Row="0" Source="{Binding RunInProgress.RunLogo}" HorizontalAlignment="Center" Width="Auto" Height="Auto" Stretch="None"/>
         <ItemsControl x:Name="buttonsItemsControl" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{Binding ItemsControlMargins}" ItemsSource="{Binding Runs}">
             <ItemsControl.Style>
                 <Style TargetType="{x:Type ItemsControl}">
