@@ -145,10 +145,6 @@ namespace MCROrganizer.Core.CustomControls
         // Run logo.
         private ImageSource _runLogo = null;
         public ImageSource RunLogo => _runLogo;
-        {
-            get => _runLogo;
-            set => _runLogo = value;
-        }
         #endregion
 
         #region Initialization
