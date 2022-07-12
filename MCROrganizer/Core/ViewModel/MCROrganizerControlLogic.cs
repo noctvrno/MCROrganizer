@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using MCROrganizer.Core.Commands;
 using MCROrganizer.Core.CustomControls;
+using MCROrganizer.Core.Designer;
 using MCROrganizer.Core.Extensions;
 using MCROrganizer.Core.Utils;
 using MCROrganizer.Core.View;
@@ -106,7 +107,7 @@ namespace MCROrganizer.Core.ViewModel
         }
 
         // General run properties.
-        private Dictionary<RunState, RunProperties> _generalRunProperties = null;
+        private Dictionary<RunState, IDesigner> _generalRunProperties = null;
 
         // Margins for the ItemsControl
         private Thickness _itemsControlMargins = new Thickness(0.0, 10.0, 0.0, 10.0);
@@ -121,8 +122,7 @@ namespace MCROrganizer.Core.ViewModel
             {
                 _itemsControlWidth = value;
                 UpdateMaximumRunWidth();
-                ComputeAbscissaCases();
-                PositionRunsOnScreen(false);
+                UpdateRuns();
             }
         }
 
@@ -192,7 +192,7 @@ namespace MCROrganizer.Core.ViewModel
             _userControl = userControl;
             _runTemplateManager = new RunTemplateManager(this);
             _runs = new ObservableCollection<DraggableButton>();
-            _generalRunProperties = new Dictionary<RunState, RunProperties>();
+            _generalRunProperties = new Dictionary<RunState, IDesigner>();
             if (RunTemplateManager.CurrentTemplatePath != String.Empty)
                 LoadRunTemplate(false);
             else
@@ -242,7 +242,7 @@ namespace MCROrganizer.Core.ViewModel
 
             RunInProgress = selectedRun;
             Int32 selectedRunIndex = _runs.IndexOf(selectedRun.Control);
-            selectedRun.Properties = _generalRunProperties[RunState.InProgress];
+            selectedRun.Designer = _generalRunProperties[RunState.InProgress];
 
             for (Int32 runIndex = 0; runIndex < _runs.Count; ++runIndex)
             {
@@ -251,21 +251,21 @@ namespace MCROrganizer.Core.ViewModel
                     continue;
 
                 // Runs to the left of the current one will be considered finished and the ones to the right are considered pending.
-                _runs[runIndex].DBDataContext.Properties = runIndex < selectedRunIndex ? _generalRunProperties[RunState.Finished] : _generalRunProperties[RunState.Pending];
+                _runs[runIndex].DBDataContext.Designer = runIndex < selectedRunIndex ? _generalRunProperties[RunState.Finished] : _generalRunProperties[RunState.Pending];
             }
         }
 
         public void SetAllRunsAsPending()
         {
             // Something more optimized could be written here, obviously, but LINQ keeps it more compact and mroe readable.
-            Int32 lastRunPendingIndex = _runs.IndexOf(_runs.LastOrDefault(x => x.DBDataContext.Properties.State != RunState.Pending));
+            Int32 lastRunPendingIndex = _runs.IndexOf(_runs.LastOrDefault(x => x.DBDataContext.Designer.RunState != RunState.Pending));
             if (lastRunPendingIndex == -1)
                 return;
 
             // Only go through runs we know for sure that are not pending.
             for (Int32 iRun = 0; iRun <= lastRunPendingIndex; ++iRun)
             {
-                _runs[iRun].DBDataContext.Properties = _generalRunProperties[RunState.Pending];
+                _runs[iRun].DBDataContext.Designer = _generalRunProperties[RunState.Pending];
             }
         }
 
@@ -279,7 +279,7 @@ namespace MCROrganizer.Core.ViewModel
             var newRun = new DraggableButton(this);
             newRun.DBDataContext.Width = _specifiedRunWidth;
             newRun.DBDataContext.Height = _specifiedRunHeight;
-            newRun.DBDataContext.Properties = _generalRunProperties[RunState.Pending]; // A new run is always added as the last run and, therefore, will always be pending.
+            newRun.DBDataContext.Designer = _generalRunProperties[RunState.Pending]; // A new run is always added as the last run and, therefore, will always be pending.
             _runs.Add(newRun);
             UpdateAbscissasAndContainers();
             UpdateMaximumRunWidth();
@@ -329,16 +329,16 @@ namespace MCROrganizer.Core.ViewModel
         /// </summary>
         private void InitializeRuns()
         {
-            RunProperties pendingRunProperties = _generalRunProperties[RunState.Pending] = new RunProperties(RunState.Pending);
-            RunProperties inProgressRunProperties = _generalRunProperties[RunState.InProgress] = new RunProperties(RunState.InProgress);
-            _generalRunProperties[RunState.Finished] = new RunProperties(RunState.Finished);
+            IDesigner pendingRunProperties = _generalRunProperties[RunState.Pending] = new ClassicDesigner(this, RunState.Pending);
+            IDesigner inProgressRunProperties = _generalRunProperties[RunState.InProgress] = new ClassicDesigner(this, RunState.InProgress);
+            _generalRunProperties[RunState.Finished] = new ClassicDesigner(this, RunState.Finished);
             if (_runs.Count == 0)
             {
                 // Initialize default runs.
                 _runs = new ObservableCollection<DraggableButton>()
                 {
-                    new DraggableButton(this, properties: inProgressRunProperties), // Default in progress run.
-                    new DraggableButton(this, properties: pendingRunProperties), // Default pending run.
+                    new DraggableButton(this, designer: inProgressRunProperties), // Default in progress run.
+                    new DraggableButton(this, designer: pendingRunProperties), // Default pending run.
                 };
             }
             else
@@ -347,22 +347,22 @@ namespace MCROrganizer.Core.ViewModel
                 // If we cannot find an associated run with a certain RunState, then skip it.
                 foreach (var run in _runs)
                 {
-                    switch (run.DBDataContext.Properties.State)
+                    switch (run.DBDataContext.Designer.RunState)
                     {
                         case RunState.Pending:
-                            _generalRunProperties[RunState.Pending] = run.DBDataContext.Properties;
+                            _generalRunProperties[RunState.Pending] = run.DBDataContext.Designer;
                             break;
                         case RunState.InProgress:
-                            _generalRunProperties[RunState.InProgress] = run.DBDataContext.Properties;
+                            _generalRunProperties[RunState.InProgress] = run.DBDataContext.Designer;
                             break;
                         case RunState.Finished:
-                            _generalRunProperties[RunState.Finished] = run.DBDataContext.Properties;
+                            _generalRunProperties[RunState.Finished] = run.DBDataContext.Designer;
                             break;
                     }
                 }
             }
 
-            SetRunAsCurrent(_runs?.FirstOrDefault(x => x.DBDataContext.Properties.State == RunState.InProgress)?.DBDataContext);
+            SetRunAsCurrent(_runs?.FirstOrDefault(x => x.DBDataContext.Designer.RunState == RunState.InProgress)?.DBDataContext);
             _abscissaByRun = new Dictionary<DraggableButton, Double>();
 
             // Compute the actual width of the ItemsControl (where the buttons will be placed).
@@ -435,49 +435,12 @@ namespace MCROrganizer.Core.ViewModel
 
         public void DesignRun(RunState runState, CustomizableRunElements customizableRunElements)
         {
-            RunProperties pickedGeneralRunProperties = _generalRunProperties[runState];
-            Int32 customColor = 0;
-            System.Drawing.Color selectedColor = new();
-
-            SolidColorBrush choiceColorBrush = customizableRunElements switch
-            {
-                CustomizableRunElements.Border => pickedGeneralRunProperties.BorderColor,
-                CustomizableRunElements.Background => pickedGeneralRunProperties.BackgroundColor,
-                CustomizableRunElements.Font => pickedGeneralRunProperties.FontColor,
-                CustomizableRunElements _ => throw new NotSupportedException()
-            };
-
-            customColor = BitConverter.ToInt32(new byte[] { choiceColorBrush.Color.R, choiceColorBrush.Color.G, choiceColorBrush.Color.B, 0 }, 0);
-            selectedColor = System.Drawing.Color.FromArgb(choiceColorBrush.Color.A, choiceColorBrush.Color.R, choiceColorBrush.Color.G, choiceColorBrush.Color.B);
-
-            ColorDialog colorDialog = new ColorDialog()
-            {
-                AllowFullOpen = true,
-                FullOpen = true,
-                Color = selectedColor,
-                CustomColors = new Int32[] { customColor }
-            };
-
-            if (colorDialog.ShowDialog() != DialogResult.OK)
+            ClassicDesigner pickedGeneralRunProperties = _generalRunProperties[runState] as ClassicDesigner;
+            if (pickedGeneralRunProperties == null)
                 return;
 
-            switch (customizableRunElements)
-            {
-                case CustomizableRunElements.Border:
-                    pickedGeneralRunProperties.BorderColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
-                    break;
-                case CustomizableRunElements.Background:
-                    pickedGeneralRunProperties.BackgroundColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
-                    break;
-                case CustomizableRunElements.Font:
-                    pickedGeneralRunProperties.FontColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
-                    break;
-            }
-
-            foreach (var matchedRun in _runs.Select(x => x.DBDataContext).Where(x => x.Properties.State == runState))
-            {
-                matchedRun.Properties = pickedGeneralRunProperties;
-            }
+            pickedGeneralRunProperties.Elements = customizableRunElements;
+            pickedGeneralRunProperties.Design();
         }
 
         private void UpdateRuns(RunParameter updatedRunParameter, Double value)
@@ -490,8 +453,7 @@ namespace MCROrganizer.Core.ViewModel
                     {
                         runData.Width = value;
                     }
-                    PositionRunsOnScreen(false);
-                    ComputeAbscissaCases();
+                    UpdateRuns();
                     break;
                 case RunParameter.Height:
                     foreach (var runData in runsData)
@@ -504,8 +466,7 @@ namespace MCROrganizer.Core.ViewModel
                     {
                         runData.Spacing = value;
                     }
-                    PositionRunsOnScreen(false);
-                    ComputeAbscissaCases();
+                    UpdateRuns();
                     break;
             }
         }
@@ -526,6 +487,12 @@ namespace MCROrganizer.Core.ViewModel
                 if (!ItemsControlWidth.IsInRange(RunWidthMax * _runs.Count + _specifiedRunSpacing))
                     System.Diagnostics.Debug.WriteLine("Something went wrong with the max run width calculation");
             }
+        }
+
+        public void UpdateRuns()
+        {
+            ComputeAbscissaCases();
+            PositionRunsOnScreen(false);
         }
         #endregion
     }

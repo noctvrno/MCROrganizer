@@ -94,7 +94,9 @@
     <Compile Include="Core\Custom Controls\EditRunDimensionMenuItem.xaml.cs">
       <DependentUpon>EditRunDimensionMenuItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Core\Designer\ClassicDesigner.cs" />
     <Compile Include="Core\Extensions\DoubleExtensions.cs" />
+    <Compile Include="Core\Designer\IDesigner.cs" />
     <Compile Include="Core\Utils\AttachedProperties.cs" />
     <Compile Include="Core\Utils\Converters.cs" />
     <Compile Include="Core\Utils\MCROrganizerUtils.cs" />

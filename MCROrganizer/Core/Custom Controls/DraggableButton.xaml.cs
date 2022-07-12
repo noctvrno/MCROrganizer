@@ -13,6 +13,8 @@ using MCROrganizer.Core.Extensions;
 using MCROrganizer.Core.Utils;
 using Newtonsoft.Json;
 using System.IO;
+using System.ComponentModel;
+using MCROrganizer.Core.Designer;
 
 namespace MCROrganizer.Core.CustomControls
 {
@@ -53,15 +55,14 @@ namespace MCROrganizer.Core.CustomControls
         }
 
         // Run properties.
-        private RunProperties _properties = null;
-        public RunProperties Properties
+        private IDesigner _designer = null;
+        public IDesigner Designer
         {
-            get => _properties;
+            get => _designer;
             set
             {
-                _properties = value;
-               _properties?.NotifyPropertyChanged(nameof(_properties.BorderColor));
-                NotifyPropertyChanged(nameof(Properties));
+                _designer = value;
+                NotifyPropertyChanged(nameof(Designer));
             }
         }
 
@@ -143,7 +144,7 @@ namespace MCROrganizer.Core.CustomControls
 
         // Run logo.
         private ImageSource _runLogo = null;
-        public ImageSource RunLogo
+        public ImageSource RunLogo => _runLogo;
         {
             get => _runLogo;
             set => _runLogo = value;
@@ -151,8 +152,8 @@ namespace MCROrganizer.Core.CustomControls
         #endregion
 
         #region Initialization
-        public DraggableButtonDataContext(RunProperties properties)
-            => Properties = properties;
+        public DraggableButtonDataContext(IDesigner designer)
+            => Designer = designer;
         #endregion
 
         #region Communication fields
@@ -174,8 +175,10 @@ namespace MCROrganizer.Core.CustomControls
 
         private void SetRunLogo()
         {
-            // MUST use a filter here.
-            var fileBrowserDialog = new System.Windows.Forms.OpenFileDialog();
+            System.Windows.Forms.OpenFileDialog fileBrowserDialog = new()
+            {
+                RestoreDirectory = true
+            };
 
             if (fileBrowserDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 return;
@@ -212,10 +215,10 @@ namespace MCROrganizer.Core.CustomControls
         #endregion
 
         #region Initialization
-        public DraggableButton(ControlLogic parent, DraggableButtonDataContext data = null, RunProperties properties = null)
+        public DraggableButton(ControlLogic parent, DraggableButtonDataContext data = null, IDesigner designer = null)
         {
             // data will be null for every instantiation of a run, except for a load because in that case, we deserialize the data from a json file.
-            DataContext = _dataContext = data ?? new DraggableButtonDataContext(properties);
+            DataContext = _dataContext = data ?? new DraggableButtonDataContext(designer);
             _dataContext.Control = this;
             InitializeComponent();
             _isDragging = false;
@@ -267,47 +270,5 @@ namespace MCROrganizer.Core.CustomControls
             DBDataContext.MakeButtonEditable(false);
         }
         #endregion
-    }
-
-    public class RunProperties : UserControlDataContext
-    {
-        private SolidColorBrush _borderColor = null;
-        public SolidColorBrush BorderColor
-        {
-            get => _borderColor;
-            set => _borderColor = value;
-        }
-
-        private SolidColorBrush _backgroundColor = null;
-        public SolidColorBrush BackgroundColor
-        {
-            get => _backgroundColor;
-            set => _backgroundColor = value;
-        }
-
-        private SolidColorBrush _fontColor = null;
-        public SolidColorBrush FontColor
-        {
-            get => _fontColor;
-            set => _fontColor = value;
-        }
-
-        private RunState _state = RunState.Pending;
-        public RunState State => _state;
-
-        public RunProperties(RunState state)
-        {
-            _state = state;
-            _borderColor = _state switch
-            {
-                RunState.Pending => new SolidColorBrush(Colors.Red),
-                RunState.InProgress => new SolidColorBrush(Colors.Yellow),
-                RunState.Finished => new SolidColorBrush(Colors.Green),
-                RunState _ => throw new NotSupportedException("Unreachable")
-            };
-
-            _backgroundColor = new SolidColorBrush(Colors.Transparent);
-            _fontColor = new SolidColorBrush(Colors.Black);
-        }
     }
 }
