@@ -30,44 +30,47 @@
     <Canvas Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}">
         <Button x:Name="gameButton" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Style="{StaticResource GameButtonStyle}" PreviewMouseLeftButtonUp="OnButtonPreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="OnButtonPreviewMouseLeftButtonDown" PreviewMouseMove="OnButtonPreviewMouseMove" HorizontalAlignment="Center" >
             <Button.Content>
-                <Canvas VerticalAlignment="Center" HorizontalAlignment="Center" Width="{Binding Width}" Height="{Binding Height}" >
+                <Canvas VerticalAlignment="Center" HorizontalAlignment="Center" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" >
                     <Label Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" PreviewMouseWheel="OnLabelPreviewMouseWheel"/>
                     <TextBox Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" attached:TextBoxProperties.IsFocused="{Binding IsFocused}" IsHitTestVisible="{Binding IsHitTestVisible}" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" Text="{Binding Name, Mode=TwoWay}" Foreground="{Binding Designer.FontColor}" LostFocus="OnTextBoxLostFocus" />
+                    <Image Source="{Binding Designer.BackgroundImage}" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" Stretch="None" />
                 </Canvas>
             </Button.Content>
             <Button.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="Operations" IsEnabled="False" FontWeight="Bold" />
+                    <Separator />
                     <!-- Delete Run command -->
-                    <MenuItem Header="Delete Run" Command="{Binding Path=PlacementTarget.DataContext.DeleteRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Delete this run.">
+                    <MenuItem Header="Delete" Command="{Binding Path=PlacementTarget.DataContext.DeleteRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Delete this run.">
                         <MenuItem.Icon>
                             <Image Source="{Binding DeleteRunImage}" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <!-- Rename command -->
-                    <MenuItem Header="Rename Run" Command="{Binding Path=PlacementTarget.DataContext.RenameRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Edit the name of this run.">
+                    <MenuItem Header="Rename" Command="{Binding Path=PlacementTarget.DataContext.RenameRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Edit the name of this run.">
                         <MenuItem.Icon>
                             <Image Source="{Binding RenameRunImage}" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <!-- Set Run as Current command -->
-                    <MenuItem Header="Set Run as Current" Command="{Binding Path=PlacementTarget.DataContext.SetCurrentRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Set this run as the current one. The runs defined before it will be marked as finished.">
+                    <MenuItem Header="Set as Current" Command="{Binding Path=PlacementTarget.DataContext.SetCurrentRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Set this run as the current one. The runs defined before it will be marked as finished.">
                         <MenuItem.Icon>
                             <Image Source="{Binding SetCurrentRunImage}" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator/>
-                    <!-- Set Run Logo command -->
-                    <MenuItem Header="Set Run Logo" Command="{Binding Path=PlacementTarget.DataContext.SetRunLogoCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Import an image file that will appear on top of the organizer when this run is set as active.">
-                        <MenuItem.Icon>
-                            <Image Source="{Binding SetRunLogoImage}" />
-                        </MenuItem.Icon>
-                    </MenuItem>
                     <!-- Design -->
                     <MenuItem Header="Design" IsEnabled="False" FontWeight="Bold" />
                     <Separator />
                     <local:DesignRunMenuItem Header="Pending Design" Icon="{StaticResource DesignPendingRunImage}" RunState="{x:Static local:RunState.Pending}"/>
                     <local:DesignRunMenuItem Header="In Progress Design" Icon="{StaticResource DesignInProgressRunImage}" RunState="{x:Static local:RunState.InProgress}"/>
                     <local:DesignRunMenuItem Header="Finished Design" Icon="{StaticResource DesignFinishedRunImage}" RunState="{x:Static local:RunState.Finished}"/>
+                    <!-- Set Run Logo command -->
+                    <MenuItem Header="Set Logo" Command="{Binding Path=PlacementTarget.DataContext.SetRunLogoCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Import an image file that will appear on top of the organizer when this run is set as active.">
+                        <MenuItem.Icon>
+                            <Image Source="{Binding SetRunLogoImage}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </ContextMenu>
             </Button.ContextMenu>
         </Button>

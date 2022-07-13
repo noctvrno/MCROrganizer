@@ -21,7 +21,8 @@ namespace MCROrganizer.Core.CustomControls
     {
         BorderColor,
         BackgroundColor,
-        FontColor
+        FontColor,
+        BackgroundImage
     };
 
     public class DesignRunMenuItemDataContext : UserControlDataContext
@@ -37,6 +38,7 @@ namespace MCROrganizer.Core.CustomControls
         private static ImageSource _designBorderColorImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DesignBorders.png")));
         private static ImageSource _designBackgroundColorImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DesignBackground.png")));
         private static ImageSource _designFontColorImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DesignFontColor.png")));
+        private static ImageSource _designBackgroundImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DesignBackgroundImage.png")));
 
         public ImageSource DesignPendingRunImage => _designPendingRunImage;
         public ImageSource DesignInProgressRunImage => _designInProgressRunImage;
@@ -44,6 +46,7 @@ namespace MCROrganizer.Core.CustomControls
         public ImageSource DesignBorderColorImage => _designBorderColorImage;
         public ImageSource DesignBackgroundColorImage => _designBackgroundColorImage;
         public ImageSource DesignFontColorImage => _designFontColorImage;
+        public ImageSource DesignBackgroundImage => _designBackgroundImage;
 
         public DraggableButtonDataContext ParentRunData { get; set; } = null;
 

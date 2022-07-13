@@ -1,13 +1,13 @@
 ﻿using MCROrganizer.Core.CustomControls;
+using System.ComponentModel;
 
 namespace MCROrganizer.Core.Designer
 {
-    public interface IDesigner
+    public interface IDesigner : INotifyPropertyChanged
     {
         // What to design.
         public DraggableButtonDataContext RunData { get; }
 
-        // Design.
         public void Design(CustomizableRunElements elementToDesign);
     }
 }

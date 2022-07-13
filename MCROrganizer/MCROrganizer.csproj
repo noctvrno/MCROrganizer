@@ -95,6 +95,7 @@
       <DependentUpon>EditRunDimensionMenuItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Core\Designer\ClassicDesigner.cs" />
+    <Compile Include="Core\Designer\ModernDesigner.cs" />
     <Compile Include="Core\Extensions\DoubleExtensions.cs" />
     <Compile Include="Core\Designer\IDesigner.cs" />
     <Compile Include="Core\Utils\AttachedProperties.cs" />
@@ -198,6 +199,14 @@
     <PackageReference Include="System.ValueTuple">
       <Version>4.5.0</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Data\Images\FinishedDefaultBGImage.png" />
+    <Resource Include="Data\Images\InProgressDefaultBGImage.png" />
+    <Resource Include="Data\Images\PendingDefaultBGImage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Data\Images\DesignBackgroundImage.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

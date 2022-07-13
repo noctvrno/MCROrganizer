@@ -119,9 +119,7 @@ namespace MCROrganizer.Core.Designer
         public void NotifyPropertyChanged(String propertyName)
         {
             if (PropertyChanged != null)
-            {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
         }
     }
 }
