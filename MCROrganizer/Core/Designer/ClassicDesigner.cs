@@ -12,13 +12,8 @@ namespace MCROrganizer.Core.Designer
 {
     public class ClassicDesigner : IDesigner, INotifyPropertyChanged
     {
-        private ControlLogic _controlLogic = null;
-        public ControlLogic ControlLogic => _controlLogic;
-
-        private RunState _runState = RunState.Pending;
-        public RunState RunState => _runState;
-
-        public CustomizableRunElements? Elements { get; set; } = null;
+        private DraggableButtonDataContext _runData = null;
+        public DraggableButtonDataContext RunData => _runData;
 
         private SolidColorBrush _borderColor = null;
         public SolidColorBrush BorderColor
@@ -64,11 +59,10 @@ namespace MCROrganizer.Core.Designer
             }
         }
 
-        public ClassicDesigner(ControlLogic controlLogic, RunState state)
+        public ClassicDesigner(DraggableButtonDataContext runData, RunState runState)
         {
-            _controlLogic = controlLogic;
-            _runState = state;
-            BorderColor = _runState switch
+            _runData = runData;
+            BorderColor = runState switch
             {
                 RunState.Pending => new SolidColorBrush(Colors.Red),
                 RunState.InProgress => new SolidColorBrush(Colors.Yellow),
@@ -80,19 +74,16 @@ namespace MCROrganizer.Core.Designer
             FontColor = new SolidColorBrush(Colors.Black);
         }
 
-        public void Design()
+        public void Design(CustomizableRunElements elementToDesign)
         {
-            if (Elements == null)
-                return;
-
             Int32 customColor = 0;
             System.Drawing.Color selectedColor = new();
 
-            SolidColorBrush choiceColorBrush = Elements switch
+            SolidColorBrush choiceColorBrush = elementToDesign switch
             {
-                CustomizableRunElements.Border => BorderColor,
-                CustomizableRunElements.Background => BackgroundColor,
-                CustomizableRunElements.Font => FontColor,
+                CustomizableRunElements.BorderColor => BorderColor,
+                CustomizableRunElements.BackgroundColor => BackgroundColor,
+                CustomizableRunElements.FontColor => FontColor,
                 CustomizableRunElements _ => throw new NotSupportedException()
             };
 
@@ -110,22 +101,17 @@ namespace MCROrganizer.Core.Designer
             if (colorDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 return;
 
-            switch (Elements)
+            switch (elementToDesign)
             {
-                case CustomizableRunElements.Border:
+                case CustomizableRunElements.BorderColor:
                     BorderColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
                     break;
-                case CustomizableRunElements.Background:
+                case CustomizableRunElements.BackgroundColor:
                     BackgroundColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
                     break;
-                case CustomizableRunElements.Font:
+                case CustomizableRunElements.FontColor:
                     FontColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
                     break;
-            }
-
-            foreach (var matchedRun in _controlLogic.Runs.Select(x => x.DBDataContext).Where(x => x.Designer.RunState == _runState))
-            {
-                matchedRun.Designer = this;
             }
         }
 

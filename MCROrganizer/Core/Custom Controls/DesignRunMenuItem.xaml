@@ -16,7 +16,7 @@
     </MenuItem.Resources>
     <!-- AttachedProperty for the parent MenuItem called RunStateProperty -->
     <!-- Command and CommandParameter bindings for the child MenuItems. The parameter should be the CustomizableRunElements (rename) enum -->
-    <MenuItem Header="Border Color" Icon="{StaticResource DesignBorderColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.Border}" ToolTip="Edit the border color." />
-    <MenuItem Header="Background Color" Icon="{StaticResource DesignBackgroundColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.Background}" ToolTip="Edit the background color." />
-    <MenuItem Header="Font Color" Icon="{StaticResource DesignFontColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.Font}" ToolTip="Edit the font color of the run names." />
+    <MenuItem Header="Border Color" Icon="{StaticResource DesignBorderColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.BorderColor}" ToolTip="Edit the border color." />
+    <MenuItem Header="Background Color" Icon="{StaticResource DesignBackgroundColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.BackgroundColor}" ToolTip="Edit the background color." />
+    <MenuItem Header="Font Color" Icon="{StaticResource DesignFontColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.FontColor}" ToolTip="Edit the font color of the run names." />
 </MenuItem>

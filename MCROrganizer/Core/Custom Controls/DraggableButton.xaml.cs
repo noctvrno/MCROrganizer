@@ -54,7 +54,11 @@ namespace MCROrganizer.Core.CustomControls
             }
         }
 
-        // Run properties.
+        // State by designer.
+        private Dictionary<RunState, IDesigner> _stateByDesigner = null;
+        public Dictionary<RunState, IDesigner> StateByDesigner => _stateByDesigner;
+
+        // Designer.
         private IDesigner _designer = null;
         public IDesigner Designer
         {
@@ -66,7 +70,6 @@ namespace MCROrganizer.Core.CustomControls
             }
         }
 
-        // Width and height (hardcoded for now, might be changed into a two-way databinding in the future).
         private Double _width = 50.0;
         public Double Width
         {
@@ -89,7 +92,6 @@ namespace MCROrganizer.Core.CustomControls
             }
         }
 
-        // Spacing between this run and the next (might be variable in the future).
         public Double Spacing { get; set; } = 20.0;
         #endregion
 
@@ -148,8 +150,14 @@ namespace MCROrganizer.Core.CustomControls
         #endregion
 
         #region Initialization
-        public DraggableButtonDataContext(IDesigner designer)
-            => Designer = designer;
+        public DraggableButtonDataContext()
+        {
+            _stateByDesigner = new Dictionary<RunState, IDesigner>();
+            foreach (RunState runState in Enum.GetValues(typeof(RunState)))
+            {
+                _stateByDesigner.Add(runState, new ClassicDesigner(this, runState));
+            }
+        }
         #endregion
 
         #region Communication fields
@@ -193,6 +201,17 @@ namespace MCROrganizer.Core.CustomControls
             _control.DBParent.NotifyPropertyChanged("RunInProgress");
             _control.DBParent.NotifyPropertyChanged("IsCurrentRunLogoSet");
         }
+
+        public void SetDesigner(RunState runState)
+        {
+            Designer = _stateByDesigner[runState];
+        }
+
+        public void DesignRun(RunState runState, CustomizableRunElements elementToDesign)
+        {
+            _stateByDesigner[runState].Design(elementToDesign);
+            NotifyPropertyChanged(nameof(Designer));
+        }
         #endregion
     }
 
@@ -211,10 +230,10 @@ namespace MCROrganizer.Core.CustomControls
         #endregion
 
         #region Initialization
-        public DraggableButton(ControlLogic parent, DraggableButtonDataContext data = null, IDesigner designer = null)
+        public DraggableButton(ControlLogic parent, DraggableButtonDataContext data = null)
         {
             // data will be null for every instantiation of a run, except for a load because in that case, we deserialize the data from a json file.
-            DataContext = _dataContext = data ?? new DraggableButtonDataContext(designer);
+            DataContext = _dataContext = data ?? new DraggableButtonDataContext();
             _dataContext.Control = this;
             InitializeComponent();
             _isDragging = false;

@@ -19,9 +19,9 @@ namespace MCROrganizer.Core.CustomControls
 
     public enum CustomizableRunElements
     {
-        Border,
-        Background,
-        Font
+        BorderColor,
+        BackgroundColor,
+        FontColor
     };
 
     public class DesignRunMenuItemDataContext : UserControlDataContext
@@ -45,9 +45,9 @@ namespace MCROrganizer.Core.CustomControls
         public ImageSource DesignBackgroundColorImage => _designBackgroundColorImage;
         public ImageSource DesignFontColorImage => _designFontColorImage;
 
-        public ControlLogic ParentControlLogic { get; set; } = null;
+        public DraggableButtonDataContext ParentRunData { get; set; } = null;
 
-        public ICommand DesignRunCommand => new MCROCommand(obj => ParentControlLogic.DesignRun(RunState, (CustomizableRunElements)obj));
+        public ICommand DesignRunCommand => new MCROCommand(obj => ParentRunData.DesignRun(RunState, (CustomizableRunElements)obj));
 
         public RunState RunState
         {
@@ -100,12 +100,15 @@ namespace MCROrganizer.Core.CustomControls
         private void OnDesignRunMenuItemLoaded(object sender, RoutedEventArgs e)
         {
             DependencyObject parentObject = VisualTreeHelper.GetParent(this);
-            while (parentObject is not System.Windows.Controls.ContextMenu)
+            while (parentObject is not DraggableButton)
             {
+                if (parentObject is ContextMenu contextMenu)
+                    parentObject = contextMenu.PlacementTarget;
+
                 parentObject = VisualTreeHelper.GetParent(parentObject);
             }
 
-            DesignRunMenuItemDataContext.ParentControlLogic = ((parentObject as ContextMenu)?.PlacementTarget as MainControl)?.DataContext as ControlLogic;
+            DesignRunMenuItemDataContext.ParentRunData = (parentObject as DraggableButton)?.DataContext as DraggableButtonDataContext;
         }
     }
 }

@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:MCROrganizer.Core.View"
              xmlns:utils="clr-namespace:MCROrganizer.Core.Utils"
              xmlns:custom="clr-namespace:MCROrganizer.Core.CustomControls"
-             xmlns:attached="clr-namespace:MCROrganizer.Core.Utils"
              mc:Ignorable="d" 
              Background="Gray"
              Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, Path=ActualHeight}"
@@ -79,12 +78,6 @@
                 <custom:EditRunDimensionMenuItem DimensionText="Spacing:" DimensionValueMin="0" DimensionValueMax="{Binding Path=PlacementTarget.DataContext.SpacingRunMax, RelativeSource={RelativeSource AncestorType=ContextMenu}}" DimensionValue="{Binding Path=PlacementTarget.DataContext.SpecifiedRunSpacing, RelativeSource={RelativeSource AncestorType=ContextMenu}, UpdateSourceTrigger=PropertyChanged}"/>
             </MenuItem>
             <Separator/>
-            <!-- Design -->
-            <MenuItem Header="Design" IsEnabled="False" FontWeight="Bold" />
-            <Separator />
-            <custom:DesignRunMenuItem Header="Pending Runs" Icon="{StaticResource DesignPendingRunImage}" RunState="{x:Static custom:RunState.Pending}"/>
-            <custom:DesignRunMenuItem Header="In Progress Runs" Icon="{StaticResource DesignInProgressRunImage}" RunState="{x:Static custom:RunState.InProgress}"/>
-            <custom:DesignRunMenuItem Header="Finished Runs" Icon="{StaticResource DesignFinishedRunImage}" RunState="{x:Static custom:RunState.Finished}"/>
         </ContextMenu>
     </UserControl.ContextMenu>
 </UserControl>

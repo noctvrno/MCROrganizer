@@ -107,7 +107,6 @@ namespace MCROrganizer.Core.ViewModel
         }
 
         // General run properties.
-        private Dictionary<RunState, IDesigner> _generalRunProperties = null;
 
         // Margins for the ItemsControl
         private Thickness _itemsControlMargins = new Thickness(0.0, 10.0, 0.0, 10.0);
@@ -192,7 +191,6 @@ namespace MCROrganizer.Core.ViewModel
             _userControl = userControl;
             _runTemplateManager = new RunTemplateManager(this);
             _runs = new ObservableCollection<DraggableButton>();
-            _generalRunProperties = new Dictionary<RunState, IDesigner>();
             if (RunTemplateManager.CurrentTemplatePath != String.Empty)
                 LoadRunTemplate(false);
             else
@@ -242,30 +240,24 @@ namespace MCROrganizer.Core.ViewModel
 
             RunInProgress = selectedRun;
             Int32 selectedRunIndex = _runs.IndexOf(selectedRun.Control);
-            selectedRun.Designer = _generalRunProperties[RunState.InProgress];
+            selectedRun.SetDesigner(RunState.InProgress);
 
-            for (Int32 runIndex = 0; runIndex < _runs.Count; ++runIndex)
+            for (Int32 iRun = 0; iRun < _runs.Count; ++iRun)
             {
                 // Skip the selected run (already handled).
-                if (runIndex == selectedRunIndex)
+                if (iRun == selectedRunIndex)
                     continue;
 
                 // Runs to the left of the current one will be considered finished and the ones to the right are considered pending.
-                _runs[runIndex].DBDataContext.Designer = runIndex < selectedRunIndex ? _generalRunProperties[RunState.Finished] : _generalRunProperties[RunState.Pending];
+                _runs[iRun].DBDataContext.SetDesigner(iRun < selectedRunIndex ? RunState.Finished : RunState.Pending);
             }
         }
 
         public void SetAllRunsAsPending()
         {
-            // Something more optimized could be written here, obviously, but LINQ keeps it more compact and mroe readable.
-            Int32 lastRunPendingIndex = _runs.IndexOf(_runs.LastOrDefault(x => x.DBDataContext.Designer.RunState != RunState.Pending));
-            if (lastRunPendingIndex == -1)
-                return;
-
-            // Only go through runs we know for sure that are not pending.
-            for (Int32 iRun = 0; iRun <= lastRunPendingIndex; ++iRun)
+            foreach (DraggableButton run in _runs)
             {
-                _runs[iRun].DBDataContext.Designer = _generalRunProperties[RunState.Pending];
+                run.DBDataContext.SetDesigner(RunState.Pending);
             }
         }
 
@@ -279,7 +271,7 @@ namespace MCROrganizer.Core.ViewModel
             var newRun = new DraggableButton(this);
             newRun.DBDataContext.Width = _specifiedRunWidth;
             newRun.DBDataContext.Height = _specifiedRunHeight;
-            newRun.DBDataContext.Designer = _generalRunProperties[RunState.Pending]; // A new run is always added as the last run and, therefore, will always be pending.
+            newRun.DBDataContext.SetDesigner(RunState.Pending); // A new run is always added as the last run and, therefore, will always be pending.
             _runs.Add(newRun);
             UpdateAbscissasAndContainers();
             UpdateMaximumRunWidth();
@@ -329,40 +321,17 @@ namespace MCROrganizer.Core.ViewModel
         /// </summary>
         private void InitializeRuns()
         {
-            IDesigner pendingRunProperties = _generalRunProperties[RunState.Pending] = new ClassicDesigner(this, RunState.Pending);
-            IDesigner inProgressRunProperties = _generalRunProperties[RunState.InProgress] = new ClassicDesigner(this, RunState.InProgress);
-            _generalRunProperties[RunState.Finished] = new ClassicDesigner(this, RunState.Finished);
             if (_runs.Count == 0)
             {
                 // Initialize default runs.
                 _runs = new ObservableCollection<DraggableButton>()
                 {
-                    new DraggableButton(this, designer: inProgressRunProperties), // Default in progress run.
-                    new DraggableButton(this, designer: pendingRunProperties), // Default pending run.
+                    new DraggableButton(this),
+                    new DraggableButton(this)
                 };
             }
-            else
-            {
-                // Initialize general runProperties.
-                // If we cannot find an associated run with a certain RunState, then skip it.
-                foreach (var run in _runs)
-                {
-                    switch (run.DBDataContext.Designer.RunState)
-                    {
-                        case RunState.Pending:
-                            _generalRunProperties[RunState.Pending] = run.DBDataContext.Designer;
-                            break;
-                        case RunState.InProgress:
-                            _generalRunProperties[RunState.InProgress] = run.DBDataContext.Designer;
-                            break;
-                        case RunState.Finished:
-                            _generalRunProperties[RunState.Finished] = run.DBDataContext.Designer;
-                            break;
-                    }
-                }
-            }
 
-            SetRunAsCurrent(_runs?.FirstOrDefault(x => x.DBDataContext.Designer.RunState == RunState.InProgress)?.DBDataContext);
+            SetRunAsCurrent(_runs.FirstOrDefault()?.DBDataContext);
             _abscissaByRun = new Dictionary<DraggableButton, Double>();
 
             // Compute the actual width of the ItemsControl (where the buttons will be placed).
@@ -431,16 +400,6 @@ namespace MCROrganizer.Core.ViewModel
 
             InitializeRuns();
             ComputeAbscissaCases();
-        }
-
-        public void DesignRun(RunState runState, CustomizableRunElements customizableRunElements)
-        {
-            ClassicDesigner pickedGeneralRunProperties = _generalRunProperties[runState] as ClassicDesigner;
-            if (pickedGeneralRunProperties == null)
-                return;
-
-            pickedGeneralRunProperties.Elements = customizableRunElements;
-            pickedGeneralRunProperties.Design();
         }
 
         private void UpdateRuns(RunParameter updatedRunParameter, Double value)
