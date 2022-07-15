@@ -152,11 +152,16 @@ namespace MCROrganizer.Core.CustomControls
         #region Initialization
         public DraggableButtonDataContext()
         {
-            Boolean isModern = true; // Debug purposes.
+            InitializeStateByDesigner();
+        }
+
+        public void InitializeStateByDesigner()
+        {
+            Boolean isClassic = ApplicationSettings.Mode == ApplicationMode.Classic;
             _stateByDesigner = new Dictionary<RunState, IDesigner>();
             foreach (RunState runState in Enum.GetValues(typeof(RunState)))
             {
-                _stateByDesigner.Add(runState, isModern ? new ModernDesigner(this, runState) : new ClassicDesigner(this, runState));
+                _stateByDesigner.Add(runState, isClassic ? new ClassicDesigner(this, runState) : new ModernDesigner(this, runState));
             }
         }
         #endregion

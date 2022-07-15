@@ -3,10 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:core="clr-namespace:MCROrganizer.Core"
              xmlns:local="clr-namespace:MCROrganizer.Core.CustomControls"
+             xmlns:utils="clr-namespace:MCROrganizer.Core.Utils"
              mc:Ignorable="d"
              Loaded="OnDesignRunMenuItemLoaded">
     <MenuItem.Resources>
+        <utils:EnumToBooleanConverter x:Key="e2b" />
+        <utils:InverseBooleanConverter x:Key="ib" />
         <Image x:Key="DesignPendingRunImage" Source="{Binding DesignPendingRunImage}" x:Shared="false"/>
         <Image x:Key="DesignInProgressRunImage" Source="{Binding DesignInProgressRunImage}" x:Shared="false"/>
         <Image x:Key="DesignFinishedRunImage" Source="{Binding DesignFinishedRunImage}" x:Shared="false"/>
@@ -17,8 +21,8 @@
     </MenuItem.Resources>
     <!-- AttachedProperty for the parent MenuItem called RunStateProperty -->
     <!-- Command and CommandParameter bindings for the child MenuItems. The parameter should be the CustomizableRunElements (rename) enum -->
-    <MenuItem Header="Border Color" Icon="{StaticResource DesignBorderColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.BorderColor}" ToolTip="Edit the border color." />
-    <MenuItem Header="Background Color" Icon="{StaticResource DesignBackgroundColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.BackgroundColor}" ToolTip="Edit the background color." />
-    <MenuItem Header="Font Color" Icon="{StaticResource DesignFontColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.FontColor}" ToolTip="Edit the font color of the run names." />
-    <MenuItem Header="Background Image" Icon="{StaticResource DesignBackgroundImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.BackgroundImage}" ToolTip="Edit the background image." />
+    <MenuItem x:Name="borderColorMenuItem" Header="Border Color" Icon="{StaticResource DesignBorderColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.BorderColor}" IsEnabled="{Binding Path=(core:ApplicationSettings.Mode), Converter={StaticResource e2b}, ConverterParameter={x:Static core:ApplicationMode.Classic}}" ToolTip="Edit the border color." />
+    <MenuItem Header="Background Color" Icon="{StaticResource DesignBackgroundColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.BackgroundColor}" IsEnabled="{Binding ElementName=borderColorMenuItem, Path=IsEnabled}" ToolTip="Edit the background color." />
+    <MenuItem Header="Font Color" Icon="{StaticResource DesignFontColorImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.FontColor}" IsEnabled="{Binding ElementName=borderColorMenuItem, Path=IsEnabled}" ToolTip="Edit the font color of the run names." />
+    <MenuItem Header="Background Image" Icon="{StaticResource DesignBackgroundImage}" Command="{Binding DesignRunCommand}" CommandParameter="{x:Static local:CustomizableRunElements.BackgroundImage}" IsEnabled="{Binding ElementName=borderColorMenuItem, Path=IsEnabled, Converter={StaticResource ib}}" ToolTip="Edit the background image." />
 </MenuItem>

@@ -3,12 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:core="clr-namespace:MCROrganizer.Core"
              xmlns:local="clr-namespace:MCROrganizer.Core.CustomControls"
-             xmlns:attached="clr-namespace:MCROrganizer.Core.Utils"
+             xmlns:utils="clr-namespace:MCROrganizer.Core.Utils"
              mc:Ignorable="d"
              Height="Auto"
              Width="Auto">
     <UserControl.Resources>
+        <utils:EnumToBooleanConverter x:Key="e2b" />
         <!-- This style is used for buttons, to remove the WPF default 'animated' mouse over effect -->
         <Style x:Key="GameButtonStyle" TargetType="Button">
             <Setter Property="OverridesDefaultStyle" Value="True"/>
@@ -32,7 +34,7 @@
             <Button.Content>
                 <Canvas VerticalAlignment="Center" HorizontalAlignment="Center" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" >
                     <Label Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" PreviewMouseWheel="OnLabelPreviewMouseWheel"/>
-                    <TextBox Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" attached:TextBoxProperties.IsFocused="{Binding IsFocused}" IsHitTestVisible="{Binding IsHitTestVisible}" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" Text="{Binding Name, Mode=TwoWay}" Foreground="{Binding Designer.FontColor}" LostFocus="OnTextBoxLostFocus" />
+                    <TextBox Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" utils:TextBoxProperties.IsFocused="{Binding IsFocused}" IsHitTestVisible="{Binding IsHitTestVisible}" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" Text="{Binding Name, Mode=TwoWay}" Foreground="{Binding Designer.FontColor}" LostFocus="OnTextBoxLostFocus" />
                     <Image Source="{Binding Designer.BackgroundImage}" Width="{Binding ElementName=gameButton, Path=Width}" Height="{Binding ElementName=gameButton, Path=Height}" Stretch="None" />
                 </Canvas>
             </Button.Content>
@@ -47,7 +49,7 @@
                         </MenuItem.Icon>
                     </MenuItem>
                     <!-- Rename command -->
-                    <MenuItem Header="Rename" Command="{Binding Path=PlacementTarget.DataContext.RenameRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Edit the name of this run.">
+                    <MenuItem Header="Rename" Command="{Binding Path=PlacementTarget.DataContext.RenameRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" IsEnabled="{Binding Path=(core:ApplicationSettings.Mode), Converter={StaticResource e2b}, ConverterParameter={x:Static core:ApplicationMode.Classic}}" ToolTip="Edit the name of this run.">
                         <MenuItem.Icon>
                             <Image Source="{Binding RenameRunImage}" />
                         </MenuItem.Icon>

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:core="clr-namespace:MCROrganizer.Core"
              xmlns:local="clr-namespace:MCROrganizer.Core.View"
              xmlns:utils="clr-namespace:MCROrganizer.Core.Utils"
              xmlns:custom="clr-namespace:MCROrganizer.Core.CustomControls"
@@ -14,6 +15,7 @@
              SizeChanged="OnUserControlChanged">
     <UserControl.Resources>
         <utils:BooleanToDoubleConverter x:Key="b2d" />
+        <utils:EnumToBooleanConverter x:Key="e2b" />
     </UserControl.Resources>
     <Grid Margin="0 20 0 0">
         <Grid.RowDefinitions>
@@ -37,9 +39,15 @@
     </Grid>
     <UserControl.ContextMenu>
         <ContextMenu>
+            <!-- Switch Mode -->
+            <MenuItem Header="{Binding SwitchModeMenuItemHeader}" Command="{Binding Path=PlacementTarget.DataContext.SwitchModeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Switches between application modes: classic (design your organizer using default properties) and modern (bring your own images to design the organizer however you want).">
+                <MenuItem.Icon>
+                    <Image Source="{Binding SwitchModeImage}" />
+                </MenuItem.Icon>
+            </MenuItem>
             <MenuItem Header="Run Manipulation" IsEnabled="False" FontWeight="Bold" />
             <Separator />
-            <!-- Add Run command -->
+            <!-- Add Run -->
             <MenuItem Header="Add Run" Command="{Binding Path=PlacementTarget.DataContext.AddRunCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Add another run.">
                 <MenuItem.Icon>
                     <Image Source="{Binding AddRunImage}" />
@@ -71,7 +79,7 @@
             <MenuItem Header="Edit" IsEnabled="False" FontWeight="Bold" />
             <Separator />
             <MenuItem Header="Run Dimensions">
-                <custom:EditRunDimensionMenuItem DimensionText="Width:" DimensionValueMin="0" DimensionValueMax="{Binding Path=PlacementTarget.DataContext.RunWidthMax, RelativeSource={RelativeSource AncestorType=ContextMenu}}" DimensionValue="{Binding Path=PlacementTarget.DataContext.SpecifiedRunWidth, RelativeSource={RelativeSource AncestorType=ContextMenu}, UpdateSourceTrigger=PropertyChanged}"/>
+                <custom:EditRunDimensionMenuItem DimensionText="Width:" DimensionValueMin="0" DimensionValueMax="{Binding Path=PlacementTarget.DataContext.RunWidthMax, RelativeSource={RelativeSource AncestorType=ContextMenu}}" DimensionValue="{Binding Path=PlacementTarget.DataContext.SpecifiedRunWidth, RelativeSource={RelativeSource AncestorType=ContextMenu}, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=(core:ApplicationSettings.Mode), Converter={StaticResource e2b}, ConverterParameter={x:Static core:ApplicationMode.Classic}}"/>
                 <Separator/>
                 <custom:EditRunDimensionMenuItem DimensionText="Height:" DimensionValueMin="0" DimensionValueMax="{Binding Path=PlacementTarget.DataContext.RunHeightMax, RelativeSource={RelativeSource AncestorType=ContextMenu}}" DimensionValue="{Binding Path=PlacementTarget.DataContext.SpecifiedRunHeight, RelativeSource={RelativeSource AncestorType=ContextMenu}, UpdateSourceTrigger=PropertyChanged}"/>
                 <Separator/>

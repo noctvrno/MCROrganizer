@@ -124,18 +124,20 @@ namespace MCROrganizer.Core.ViewModel
                 UpdateRuns();
             }
         }
-
-        // Template manager.
-        private RunTemplateManager _runTemplateManager = null;
         #endregion
 
-        #region Two-Way Helper DataBinding Properties
-        // ItemsSource for the ItemsControl
-        private ObservableCollection<DraggableButton> _runs = null;
-        public ObservableCollection<DraggableButton> Runs
+        #region One-Way DataBinding Properties
+        public String SwitchModeMenuItemHeader
         {
-            get => _runs;
-            set => _runs = value;
+            get
+            {
+                return ApplicationSettings.Mode switch
+                {
+                    ApplicationMode.Classic => $"Switch to {ApplicationMode.Modern} mode",
+                    ApplicationMode.Modern => $"Switch to {ApplicationMode.Classic} mode",
+                    _ => throw new NotSupportedException()
+                };
+            }
         }
 
         // Main HashTable that stores each run and their current abscissa.
@@ -145,6 +147,36 @@ namespace MCROrganizer.Core.ViewModel
         // Secondary HashTable that stores each possible run number scenario next to their respective collection of abscissas.
         private Dictionary<Int32, List<Double>> _abscissaByNumberOfRunsCases = null;
 
+        // View object.
+        private MainControl _userControl = null;
+        public MainControl MainControl => _userControl;
+        public Boolean IsCurrentRunLogoSet => _runInProgress?.RunLogo != null;
+        #endregion
+
+        #region Two-Way DataBinding Properties
+        // ItemsSource for the ItemsControl
+        private ObservableCollection<DraggableButton> _runs = null;
+        public ObservableCollection<DraggableButton> Runs
+        {
+            get => _runs;
+            set => _runs = value;
+        }
+
+        // Current run.
+        private DraggableButtonDataContext _runInProgress = null;
+        public DraggableButtonDataContext RunInProgress
+        {
+            get => _runInProgress;
+            set
+            {
+                _runInProgress = value;
+                NotifyPropertyChanged(nameof(RunInProgress));
+                NotifyPropertyChanged(nameof(IsCurrentRunLogoSet));
+            }
+        }
+        #endregion
+
+        #region Commands
         // Add Run Command.
         private static ImageSource _addRunImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "AddRun.png")));
         public ImageSource AddRunImage => _addRunImage;
@@ -165,24 +197,15 @@ namespace MCROrganizer.Core.ViewModel
         public ImageSource LoadRunImage => _loadRunImage;
         public ICommand LoadRunCommand => new MCROCommand(_ => LoadRunTemplate());
 
-        // View object.
-        private MainControl _userControl = null;
-        public MainControl MainControl => _userControl;
+        // Load Run Template Command.
+        private static ImageSource _switchModeImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "SwitchMode.png")));
+        public ImageSource SwitchModeImage => _switchModeImage;
+        public ICommand SwitchModeCommand => new MCROCommand(_ => SwitchMode());
+        #endregion
 
-        // Current run.
-        private DraggableButtonDataContext _runInProgress = null;
-        public DraggableButtonDataContext RunInProgress
-        {
-            get => _runInProgress;
-            set
-            {
-                _runInProgress = value;
-                NotifyPropertyChanged(nameof(RunInProgress));
-                NotifyPropertyChanged(nameof(IsCurrentRunLogoSet));
-            }
-        }
-
-        public Boolean IsCurrentRunLogoSet => _runInProgress?.RunLogo != null;
+        #region Misc properties
+        // Template manager.
+        private RunTemplateManager _runTemplateManager = null;
         #endregion
 
         #region Initialization
@@ -400,6 +423,24 @@ namespace MCROrganizer.Core.ViewModel
 
             InitializeRuns();
             ComputeAbscissaCases();
+        }
+
+        private void SwitchMode()
+        {
+            ApplicationSettings.Mode = ApplicationSettings.Mode switch
+            {
+                ApplicationMode.Classic => ApplicationMode.Modern,
+                ApplicationMode.Modern => ApplicationMode.Classic,
+                _ => throw new NotSupportedException()
+            };
+
+            foreach (var run in _runs)
+            {
+                run.DBDataContext?.InitializeStateByDesigner();
+            }
+
+            SetAllRunsAsPending();
+            NotifyPropertyChanged(nameof(SwitchModeMenuItemHeader));
         }
 
         private void UpdateRuns(RunParameter updatedRunParameter, Double value)

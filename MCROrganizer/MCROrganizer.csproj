@@ -84,6 +84,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\ApplicationSettings.cs" />
     <Compile Include="Core\Commands\MCROrganizerCommands.cs" />
     <Compile Include="Core\Custom Controls\DraggableButton.xaml.cs">
       <DependentUpon>DraggableButton.xaml</DependentUpon>
@@ -207,6 +208,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Data\Images\DesignBackgroundImage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Data\Images\SwitchMode.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

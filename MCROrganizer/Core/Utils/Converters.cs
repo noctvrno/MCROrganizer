@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 
 namespace MCROrganizer.Core.Utils
@@ -24,5 +21,37 @@ namespace MCROrganizer.Core.Utils
         {
             throw new NotImplementedException(); // Cannot convert from a double back to a boolean for now. There is no need.
         }
+    }
+
+    public class EnumToBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!value.GetType().IsEnum || !parameter.GetType().IsEnum)
+                return DependencyProperty.UnsetValue;
+
+            return value.Equals(parameter);
         }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException(); // Cannot convert a boolean into an enum.
+        }
+    }
+
+    public class InverseBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is Boolean bValue && bValue)
+                return false;
+
+            return true;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException(); // Cannot convert a boolean into an enum.
+        }
+    }
 }
