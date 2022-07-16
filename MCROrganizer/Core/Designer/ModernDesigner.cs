@@ -41,23 +41,10 @@ namespace MCROrganizer.Core.Designer
             if (elementToDesign != CustomizableRunElements.BackgroundImage)
                 return;
 
-            System.Windows.Forms.OpenFileDialog openFileDialog = new()
-            {
-                RestoreDirectory = true
-            };
-
-            if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            if (!OpenFileDialogUtils.TryGetImage(out BitmapImage backgroundImage))
                 return;
 
-            try
-            {
-                BackgroundImage = new BitmapImage(new(openFileDialog.FileName));
-            }
-            catch
-            {
-                MessageBox.Show("Could not load the image file. Please try again with a different image.", PathUtils.Caption, MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
+            BackgroundImage = backgroundImage;
 
             // Don't try changing to Double.NaN for Auto scale. This will break further computations.
             RunData.Width = BackgroundImage.Width;

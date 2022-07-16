@@ -102,6 +102,7 @@
     <Compile Include="Core\Utils\AttachedProperties.cs" />
     <Compile Include="Core\Utils\Converters.cs" />
     <Compile Include="Core\Utils\MCROrganizerUtils.cs" />
+    <Compile Include="Core\Utils\OpenFileDialogUtils.cs" />
     <Compile Include="Core\Utils\RunTemplateManager.cs" />
     <Compile Include="Core\Utils\UserControlDataContext.cs" />
     <Compile Include="Core\ViewModel\MCROrganizerControlLogic.cs" />
@@ -211,6 +212,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Data\Images\SwitchMode.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Data\Images\ChangeBackgroundImage.png" />
+    <Resource Include="Data\Images\DefaultBackground.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -192,23 +192,10 @@ namespace MCROrganizer.Core.CustomControls
 
         private void SetRunLogo()
         {
-            System.Windows.Forms.OpenFileDialog fileBrowserDialog = new()
-            {
-                RestoreDirectory = true
-            };
-
-            if (fileBrowserDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            if (!OpenFileDialogUtils.TryGetImage(out BitmapImage runLogo))
                 return;
 
-            try
-            {
-                _runLogo = new BitmapImage(new Uri(fileBrowserDialog.FileName));
-            }
-            catch
-            {
-                MessageBox.Show("Could not load the image file. Please try again with a different image.", PathUtils.Caption, MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
+            _runLogo = runLogo;
 
             // Update the main view after uploading the run logo.
             _control.DBParent.NotifyPropertyChanged("RunInProgress");

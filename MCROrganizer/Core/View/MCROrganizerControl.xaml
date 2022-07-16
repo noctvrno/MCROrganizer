@@ -8,16 +8,18 @@
              xmlns:utils="clr-namespace:MCROrganizer.Core.Utils"
              xmlns:custom="clr-namespace:MCROrganizer.Core.CustomControls"
              mc:Ignorable="d" 
-             Background="Gray"
              Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, Path=ActualHeight}"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch"
              SizeChanged="OnUserControlChanged">
+    <UserControl.Background>
+        <ImageBrush ImageSource="{Binding Background}" Stretch="None" />
+    </UserControl.Background>
     <UserControl.Resources>
         <utils:BooleanToDoubleConverter x:Key="b2d" />
         <utils:EnumToBooleanConverter x:Key="e2b" />
     </UserControl.Resources>
-    <Grid Margin="0 20 0 0">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -86,6 +88,11 @@
                 <custom:EditRunDimensionMenuItem DimensionText="Spacing:" DimensionValueMin="0" DimensionValueMax="{Binding Path=PlacementTarget.DataContext.SpacingRunMax, RelativeSource={RelativeSource AncestorType=ContextMenu}}" DimensionValue="{Binding Path=PlacementTarget.DataContext.SpecifiedRunSpacing, RelativeSource={RelativeSource AncestorType=ContextMenu}, UpdateSourceTrigger=PropertyChanged}"/>
             </MenuItem>
             <Separator/>
+            <MenuItem Header="Change background image" Command="{Binding Path=PlacementTarget.DataContext.ChangeBackgroundImageCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" ToolTip="Change the application background image.">
+                <MenuItem.Icon>
+                    <Image Source="{Binding ChangeBackgroundImage}" />
+                </MenuItem.Icon>
+            </MenuItem>
         </ContextMenu>
     </UserControl.ContextMenu>
 </UserControl>

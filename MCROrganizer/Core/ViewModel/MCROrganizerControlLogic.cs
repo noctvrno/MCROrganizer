@@ -127,6 +127,7 @@ namespace MCROrganizer.Core.ViewModel
         #endregion
 
         #region One-Way DataBinding Properties
+        // Switch mode menu item header.
         public String SwitchModeMenuItemHeader
         {
             get
@@ -137,6 +138,18 @@ namespace MCROrganizer.Core.ViewModel
                     ApplicationMode.Modern => $"Switch to {ApplicationMode.Classic} mode",
                     _ => throw new NotSupportedException()
                 };
+            }
+        }
+
+        // Background.
+        private ImageSource _background = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "DefaultBackground.png")));
+        public ImageSource Background
+        {
+            get => _background;
+            set
+            {
+                _background = value;
+                NotifyPropertyChanged(nameof(Background));
             }
         }
 
@@ -201,6 +214,10 @@ namespace MCROrganizer.Core.ViewModel
         private static ImageSource _switchModeImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "SwitchMode.png")));
         public ImageSource SwitchModeImage => _switchModeImage;
         public ICommand SwitchModeCommand => new MCROCommand(_ => SwitchMode());
+
+        private static ImageSource _changeBackgroundImage = new BitmapImage(new Uri(Path.Combine(PathUtils.ImagePath, "ChangeBackgroundImage.png")));
+        public ImageSource ChangeBackgroundImage => _changeBackgroundImage;
+        public ICommand ChangeBackgroundImageCommand => new MCROCommand(_ => ChangeBackground());
         #endregion
 
         #region Misc properties
@@ -443,6 +460,14 @@ namespace MCROrganizer.Core.ViewModel
             SetAllRunsAsPending();
             UpdateRuns();
             NotifyPropertyChanged(nameof(SwitchModeMenuItemHeader));
+        }
+
+        private void ChangeBackground()
+        {
+            if (!OpenFileDialogUtils.TryGetImage(out BitmapImage background))
+                return;
+
+            Background = background;
         }
 
         private void UpdateRuns(RunParameter updatedRunParameter, Double value)
