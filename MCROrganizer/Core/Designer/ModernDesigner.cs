@@ -37,6 +37,10 @@ namespace MCROrganizer.Core.Designer
 
         public void Design(CustomizableRunElements elementToDesign)
         {
+            // Turn this into a switch if we ever have multiple Elements to deal with for the ModernDesigner.
+            if (elementToDesign != CustomizableRunElements.BackgroundImage)
+                return;
+
             System.Windows.Forms.OpenFileDialog openFileDialog = new()
             {
                 RestoreDirectory = true
@@ -47,20 +51,17 @@ namespace MCROrganizer.Core.Designer
 
             try
             {
-                switch (elementToDesign)
-                {
-                    case CustomizableRunElements.BackgroundImage:
-                        BackgroundImage = new BitmapImage(new(openFileDialog.FileName));
-                        break;
-                    default:
-                        throw new NotSupportedException();
-                }
+                BackgroundImage = new BitmapImage(new(openFileDialog.FileName));
             }
             catch
             {
                 MessageBox.Show("Could not load the image file. Please try again with a different image.", PathUtils.Caption, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+
+            // Don't try changing to Double.NaN for Auto scale. This will break further computations.
+            RunData.Width = BackgroundImage.Width;
+            RunData.Height = BackgroundImage.Height;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

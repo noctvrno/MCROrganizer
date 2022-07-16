@@ -43,7 +43,7 @@ namespace MCROrganizer.Core.CustomControls
     {
         #region Customization Properties
         // Run name.
-        private String _name = "DS";
+        private String _name = DefaultRunProperties.NAME;
         public String Name
         {
             get => _name;
@@ -70,7 +70,7 @@ namespace MCROrganizer.Core.CustomControls
             }
         }
 
-        private Double _width = 50.0;
+        private Double _width = DefaultRunProperties.WIDTH;
         public Double Width
         {
             get => _width;
@@ -81,7 +81,7 @@ namespace MCROrganizer.Core.CustomControls
             }
         }
 
-        private Double _height = 50.0;
+        private Double _height = DefaultRunProperties.HEIGHT;
         public Double Height
         {
             get => _height;
@@ -152,17 +152,24 @@ namespace MCROrganizer.Core.CustomControls
         #region Initialization
         public DraggableButtonDataContext()
         {
-            InitializeStateByDesigner();
+            InitializeStateByDesigner(ApplicationSettings.Mode == ApplicationMode.Classic);
         }
 
-        public void InitializeStateByDesigner()
+        public void InitializeStateByDesigner(Boolean isClassic)
         {
-            Boolean isClassic = ApplicationSettings.Mode == ApplicationMode.Classic;
             _stateByDesigner = new Dictionary<RunState, IDesigner>();
             foreach (RunState runState in Enum.GetValues(typeof(RunState)))
             {
                 _stateByDesigner.Add(runState, isClassic ? new ClassicDesigner(this, runState) : new ModernDesigner(this, runState));
             }
+        }
+
+        public void ResetOnModeSwitch(Boolean isClassic)
+        {
+            Width = DefaultRunProperties.WIDTH;
+            Height = DefaultRunProperties.HEIGHT;
+            Name = isClassic ? DefaultRunProperties.NAME : String.Empty;
+            InitializeStateByDesigner(isClassic);
         }
         #endregion
 
@@ -291,5 +298,12 @@ namespace MCROrganizer.Core.CustomControls
             DBDataContext.MakeButtonEditable(false);
         }
         #endregion
+    }
+
+    public class DefaultRunProperties
+    {
+        public const Double WIDTH = 50.0;
+        public const Double HEIGHT = 50.0;
+        public const String NAME = "Run";
     }
 }

@@ -434,12 +434,14 @@ namespace MCROrganizer.Core.ViewModel
                 _ => throw new NotSupportedException()
             };
 
+            Boolean isClassic = ApplicationSettings.Mode == ApplicationMode.Classic;
             foreach (var run in _runs)
             {
-                run.DBDataContext?.InitializeStateByDesigner();
+                run.DBDataContext?.ResetOnModeSwitch(isClassic);
             }
 
             SetAllRunsAsPending();
+            UpdateRuns();
             NotifyPropertyChanged(nameof(SwitchModeMenuItemHeader));
         }
 
