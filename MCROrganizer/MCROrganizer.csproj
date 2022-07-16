@@ -35,6 +35,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>MCROrganizer.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -216,6 +219,9 @@
   <ItemGroup>
     <Resource Include="Data\Images\ChangeBackgroundImage.png" />
     <Resource Include="Data\Images\DefaultBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="MCROrganizer.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
