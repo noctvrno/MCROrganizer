@@ -105,6 +105,7 @@
     <Compile Include="Core\Utils\AttachedProperties.cs" />
     <Compile Include="Core\Utils\Converters.cs" />
     <Compile Include="Core\Utils\MCROrganizerUtils.cs" />
+    <Compile Include="Core\Utils\MessageBoxUtils.cs" />
     <Compile Include="Core\Utils\OpenFileDialogUtils.cs" />
     <Compile Include="Core\Utils\RunTemplateManager.cs" />
     <Compile Include="Core\Utils\UserControlDataContext.cs" />

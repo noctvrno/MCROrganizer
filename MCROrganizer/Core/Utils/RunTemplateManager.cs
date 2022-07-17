@@ -51,18 +51,31 @@ namespace MCROrganizer.Core.Utils
             WriteToJSON(_managedControl.Runs.Select(x => x.DBDataContext));
         }
 
-        public static void WriteToJSON(Object serializedData, String filePath = null)
+        public static void WriteToJSON(Object runData, String filePath = null)
         {
-            // Create a JSON string.
-            String jsonString = JsonConvert.SerializeObject
-            (
-                serializedData,
-                Formatting.Indented,
-                new JsonConverter[] { new StringEnumConverter() }
-            );
-
             // Write all of it into the current template path.
-            File.WriteAllText(filePath ?? _currentTemplatePath, jsonString);
+            RunTemplate runTemplate = new()
+            {
+                ApplicationMode = ApplicationSettings.Mode,
+                RunsData = runData as IEnumerable<DraggableButtonDataContext>
+            };
+
+            String jsonString = GetJsonString(runTemplate);
+
+            try
+            {
+                File.WriteAllText(filePath ?? _currentTemplatePath, jsonString);
+            }
+            catch (Exception ex)
+            {
+                MessageBoxUtils.ShowError(ex.InnerException?.Message ?? ex.Message);
+                return;
+            }
+        }
+
+        private static String GetJsonString(Object data)
+        {
+            return JsonConvert.SerializeObject(data, Formatting.Indented, new JsonConverter[] { new StringEnumConverter() });
         }
 
         public void SaveAs()
@@ -84,9 +97,7 @@ namespace MCROrganizer.Core.Utils
             WriteToJSON(_managedControl.Runs.Select(x => x.DBDataContext));
         }
 
-        public Collection<T> LoadData<T, U>(ICollection<U> entitiesToClearOnLoad, Boolean browseForFile = true)
-            where T : UserControlDataContext
-            where U : System.Windows.Controls.UserControl
+        public Boolean TryLoadData(Boolean browseForFile = true)
         {
             OpenFileDialog fileBrowserDialog = null;
             if (browseForFile)
@@ -100,10 +111,8 @@ namespace MCROrganizer.Core.Utils
                 };
 
                 if (fileBrowserDialog.ShowDialog() != DialogResult.OK)
-                    return new Collection<T>();
+                    return false;
             }
-
-            entitiesToClearOnLoad.Clear();
 
             // Update the path of the current template.
             if (fileBrowserDialog?.FileName != null)
@@ -117,20 +126,45 @@ namespace MCROrganizer.Core.Utils
             }
             catch (FileNotFoundException)
             {
-                return new Collection<T>();
+                return false;
             }
 
-            // Actual deserialization.
-            var runsData = new ObservableCollection<T>
-            (
-                JsonConvert.DeserializeObject<ObservableCollection<T>>
-                (
-                    jsonString,
-                    new JsonConverter[] { new StringEnumConverter() }
-                )
-            );
+            // Deserialize the template.
 
-            return runsData;
+            RunTemplate runTemplate = null;
+            try
+            {
+                runTemplate = JsonConvert.DeserializeObject<RunTemplate>(jsonString, new JsonConverter[] { new StringEnumConverter() });
+            }
+            catch (Exception ex)
+            {
+                MessageBoxUtils.ShowError(ex.InnerException?.Message ?? ex.Message);
+                return false;
+            }
+
+            // Convert the runsData object.
+            var runsData = new ObservableCollection<DraggableButtonDataContext>(runTemplate.RunsData);
+            if (runsData == null || runsData.Count == 0)
+            {
+                MessageBoxUtils.ShowError("Loading the runs data failed.");
+                return false;
+            }
+
+            // Set the ApplicationMode.
+            ApplicationSettings.Mode = runTemplate.ApplicationMode;
+
+            foreach (var runData in runsData)
+            {
+                _managedControl.Runs.Add(new DraggableButton(_managedControl, runData));
+            }
+
+            return true;
         }
+    }
+
+    public class RunTemplate
+    {
+        public ApplicationMode ApplicationMode { get; set; }
+        public IEnumerable<DraggableButtonDataContext> RunsData { get; set; }
     }
 }

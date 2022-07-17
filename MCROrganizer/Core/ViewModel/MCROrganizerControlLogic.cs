@@ -431,12 +431,9 @@ namespace MCROrganizer.Core.ViewModel
 
         private void LoadRunTemplate(Boolean browseForFile = true)
         {
-            var deserializedRunsData = new ObservableCollection<DraggableButtonDataContext>(_runTemplateManager.LoadData<DraggableButtonDataContext, DraggableButton>(_runs, browseForFile));
-
-            foreach (var runData in deserializedRunsData)
-            {
-                _runs.Add(new DraggableButton(this, runData));
-            }
+            _runs.Clear();
+            if (!_runTemplateManager.TryLoadData(browseForFile))
+                return;
 
             InitializeRuns();
             ComputeAbscissaCases();
