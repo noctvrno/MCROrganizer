@@ -153,9 +153,7 @@ namespace MCROrganizer.Core
                 return false;
             }
 
-            // Convert the runsData object.
-            var runsData = new ObservableCollection<DraggableButtonDataContext>(runTemplate.RunsData);
-            if (runsData == null || runsData.Count == 0)
+            if (runTemplate.RunsData == null || runTemplate.RunsData.Count == 0)
             {
                 MessageBoxUtils.ShowError("Loading the runs data failed.");
                 return false;
@@ -166,7 +164,8 @@ namespace MCROrganizer.Core
             // Set the ApplicationMode.
             ApplicationSettings.Mode = runTemplate.ApplicationMode;
 
-            foreach (var runData in runsData)
+            // Create the runs.
+            foreach (var runData in runTemplate.RunsData)
             {
                 _managedControl.Runs.Add(new DraggableButton(_managedControl, runData));
             }
