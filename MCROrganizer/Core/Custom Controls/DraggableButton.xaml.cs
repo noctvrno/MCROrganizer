@@ -56,7 +56,11 @@ namespace MCROrganizer.Core.CustomControls
 
         // State by designer.
         private Dictionary<RunState, IDesigner> _stateByDesigner = null;
-        public Dictionary<RunState, IDesigner> StateByDesigner => _stateByDesigner;
+        public Dictionary<RunState, IDesigner> StateByDesigner
+        {
+            get => _stateByDesigner;
+            set => _stateByDesigner = value;
+        }
 
         // Designer.
         private IDesigner _designer = null;
@@ -69,6 +73,8 @@ namespace MCROrganizer.Core.CustomControls
                 NotifyPropertyChanged(nameof(Designer));
             }
         }
+
+        public RunState RunState { get; set; }
 
         private Double _width = DefaultRunProperties.WIDTH;
         public Double Width
@@ -205,6 +211,7 @@ namespace MCROrganizer.Core.CustomControls
         public void SetDesigner(RunState runState)
         {
             Designer = _stateByDesigner[runState];
+            RunState = runState;
         }
 
         public void DesignRun(RunState runState, CustomizableRunElements elementToDesign)

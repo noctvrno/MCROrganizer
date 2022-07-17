@@ -371,7 +371,7 @@ namespace MCROrganizer.Core.ViewModel
                 };
             }
 
-            SetRunAsCurrent(_runs.FirstOrDefault()?.DBDataContext);
+            SetRunAsCurrent(_runs.FirstOrDefault(x => x.DBDataContext.RunState == RunState.InProgress)?.DBDataContext ?? _runs.FirstOrDefault().DBDataContext);
             _abscissaByRun = new Dictionary<DraggableButton, Double>();
 
             // Compute the actual width of the ItemsControl (where the buttons will be placed).
@@ -431,7 +431,6 @@ namespace MCROrganizer.Core.ViewModel
 
         private void LoadRunTemplate(Boolean browseForFile = true)
         {
-            _runs.Clear();
             if (!_runTemplateManager.TryLoadData(browseForFile))
                 return;
 

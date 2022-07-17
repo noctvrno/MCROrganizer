@@ -1,4 +1,6 @@
 ﻿using MCROrganizer.Core.CustomControls;
+using MCROrganizer.Core.Designer;
+using MCROrganizer.Core.Utils;
 using MCROrganizer.Core.ViewModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -9,7 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace MCROrganizer.Core.Utils
+namespace MCROrganizer.Core
 {
     public class RunTemplateManager
     {
@@ -57,7 +59,7 @@ namespace MCROrganizer.Core.Utils
             RunTemplate runTemplate = new()
             {
                 ApplicationMode = ApplicationSettings.Mode,
-                RunsData = runData as IEnumerable<DraggableButtonDataContext>
+                RunsData = new List<DraggableButtonDataContext>(runData as IEnumerable<DraggableButtonDataContext>)
             };
 
             String jsonString = GetJsonString(runTemplate);
@@ -75,7 +77,12 @@ namespace MCROrganizer.Core.Utils
 
         private static String GetJsonString(Object data)
         {
-            return JsonConvert.SerializeObject(data, Formatting.Indented, new JsonConverter[] { new StringEnumConverter() });
+            return JsonConvert.SerializeObject(data, new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                Formatting = Formatting.Indented,
+                Converters = new JsonConverter[] { new StringEnumConverter() }
+            });
         }
 
         public void SaveAs()
@@ -130,11 +137,15 @@ namespace MCROrganizer.Core.Utils
             }
 
             // Deserialize the template.
-
             RunTemplate runTemplate = null;
             try
             {
-                runTemplate = JsonConvert.DeserializeObject<RunTemplate>(jsonString, new JsonConverter[] { new StringEnumConverter() });
+                runTemplate = JsonConvert.DeserializeObject<RunTemplate>(jsonString, new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.Auto,
+                    Formatting = Formatting.Indented,
+                    Converters = new JsonConverter[] { new StringEnumConverter() }
+                });
             }
             catch (Exception ex)
             {
@@ -149,6 +160,8 @@ namespace MCROrganizer.Core.Utils
                 MessageBoxUtils.ShowError("Loading the runs data failed.");
                 return false;
             }
+
+            _managedControl.Runs.Clear();
 
             // Set the ApplicationMode.
             ApplicationSettings.Mode = runTemplate.ApplicationMode;
@@ -165,6 +178,6 @@ namespace MCROrganizer.Core.Utils
     public class RunTemplate
     {
         public ApplicationMode ApplicationMode { get; set; }
-        public IEnumerable<DraggableButtonDataContext> RunsData { get; set; }
+        public List<DraggableButtonDataContext> RunsData { get; set; }
     }
 }
