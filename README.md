@@ -33,7 +33,7 @@ Right click to bring up the global run settings and select "Change background im
 
 ### Others
 - You can save the current ChallengeRun as an .MCRO file and Load it the next time you stream. This saves everything you have changed/added in the current template for easy reusability.
-- If you wish to capture the application and make the background transparent you can do so by adding a Color Key as an effect on the captured window. Play around with the settings in order to achieve the best result.
+- For OBS users: you can make the application's background transparent by adding a Color Key as an effect on the captured window. Play around with the settings in order to achieve the best result.
 
 ### Future implementations:
 - Classic mode: Transparent backgrounds and borders for the runs - Not difficult to implement.
