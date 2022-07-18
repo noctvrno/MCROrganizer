@@ -328,6 +328,7 @@ namespace MCROrganizer.Core.ViewModel
             _abscissaByRun.Remove(deletedRun);
             UpdateAbscissasAndContainers();
             UpdateMaximumRunWidth();
+            UpdateRuns();
         }
 
         /// <summary>
@@ -381,7 +382,7 @@ namespace MCROrganizer.Core.ViewModel
 
         private void PositionRunsOnScreen(Boolean isInitializationPhase = true)
         {
-            Double runWidth = RunInProgress.Width;
+            Double runWidth = _runs.Select(x => x.DBDataContext.Width).Aggregate((maxWidth, currentWidth) => currentWidth > maxWidth ? currentWidth : maxWidth);
             Double nextPivotPoint = _specifiedRunSpacing + runWidth;
 
             // Compute the start abscissa of the runs.
@@ -409,7 +410,7 @@ namespace MCROrganizer.Core.ViewModel
         private void ComputeAbscissaCases()
         {
             _abscissaByNumberOfRunsCases = new Dictionary<Int32, List<Double>>();
-            Double runWidth = RunInProgress.Width;
+            Double runWidth = _runs.Select(x => x.DBDataContext.Width).Aggregate((maxWidth, currentWidth) => currentWidth > maxWidth ? currentWidth : maxWidth);
             Int32 maximumNumberOfRuns = (Int32)Math.Floor(_itemsControlWidth / (runWidth + _specifiedRunSpacing));
 
             for (Int32 iRunCase = _minimumNumberOfRuns; iRunCase <= maximumNumberOfRuns; ++iRunCase)
