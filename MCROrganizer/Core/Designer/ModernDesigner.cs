@@ -49,6 +49,9 @@ namespace MCROrganizer.Core.Designer
             // Don't try changing to Double.NaN for Auto scale. This will break further computations.
             RunData.Width = BackgroundImage.Width;
             RunData.Height = BackgroundImage.Height;
+
+            // Update runs in order to recompute their position on the screen.
+            RunData.Control.DBParent.UpdateRuns();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
