@@ -311,6 +311,7 @@ namespace MCROrganizer.Core.ViewModel
             var newRun = new DraggableButton(this);
             newRun.DBDataContext.Width = _specifiedRunWidth;
             newRun.DBDataContext.Height = _specifiedRunHeight;
+            newRun.DBDataContext.Name = _runs.LastOrDefault()?.DBDataContext?.Name;
             newRun.DBDataContext.SetDesigner(RunState.Pending); // A new run is always added as the last run and, therefore, will always be pending.
             _runs.Add(newRun);
             UpdateAbscissasAndContainers();
