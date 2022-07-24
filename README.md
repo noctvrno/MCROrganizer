@@ -8,9 +8,14 @@ Currently being developed by one person - that's me :) - using C# WPF. Below you
 
 # Demonstration
 There are two main modes of the application: Classic mode and Moden mode.
-*Classic Mode* features only rectangular shapes for displaying runs that have borders. The colors of the borders, backgrounds and fonts can be fully customizable. The size parameters can also be changed, but bear in mind that this is a global effect and it will apply to all runs.
+**Classic Mode** features only rectangular shapes for displaying runs that have borders. The colors of the borders, backgrounds and fonts can be fully customizable. The size parameters can also be changed, but bear in mind that this is a global effect and it will apply to all runs.
 
-With *Modern Mode* you can attach any image in place of the default ones that will represent the pending, in progress and finished runs. This mode was designed with the idea in mind that all runs will still have the same Width and Height, ensuring the best possible alignment and quality. MCRO will allow the addition of inconsistent image resolutions, but be warned that the results may not be good looking and the workflow might be buggy.
+With **Modern Mode** you can attach any image in place of the default ones that will represent the pending, in progress and finished runs. This mode was designed with the idea in mind that all runs will still have the same Width and Height, ensuring the best possible **alignment** and **quality**. MCRO will allow the addition of inconsistent image resolutions, but be warned that the results may not be good looking and the workflow might be buggy.
+
+Each run has **3** possible states it can be in:
+- Pending: the run has not been started yet; it is marked with the color **red** by default.
+- In Progress: the currently active run, the game that you are playing at this moment; it is marked with the color **yellow** by default.
+- Finished: the run has already been completed; it is marked with the color **green** by default.
 
 ### Run manipulation: adding, deleting, renaming and moving runs around
 ![RunManipulation](https://user-images.githubusercontent.com/63927668/178163180-14c89f91-1f21-405c-9a83-d4ffac0e946c.gif)
